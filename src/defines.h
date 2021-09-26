@@ -8,5 +8,6 @@
 
 #define MAX_LISTEN_SIZE 10
 
+#define MAX_EVENTS 10
 
 #endif /* DEFINES_H */
