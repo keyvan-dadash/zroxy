@@ -1,0 +1,10 @@
+
+
+#obj files
+*.o
+*.out
+
+
+
+#build folders
+build/
