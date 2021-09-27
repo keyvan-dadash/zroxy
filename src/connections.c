@@ -24,11 +24,14 @@ void free_proxy_handler(proxy_handler_t *proxy_obj)
     free(proxy_obj);
 }
 
+
 handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_fd)
 {
     client_connection_info_t client_conn_info;
     client_conn_info.client_sock_fd = client_sock_fd;
     client_conn_info.is_client_closed = 0;
+    client_conn_info.max_bufer_size = READ_BUF_SIZE;
+    client_conn_info.read_buf = malloc(sizeof(char) * READ_BUF_SIZE);
 
     proxy_handler->client_info = client_conn_info;
     proxy_handler->client_info.client_handlers->on_read = on_client_read_event;
@@ -48,6 +51,8 @@ handler_t* make_backend_handler(proxy_handler_t *proxy_handler, int backend_sock
     backend_connection_info_t backend_conn_info;
     backend_conn_info.backend_sock_fd = backend_sock_fd;
     backend_conn_info.is_backend_closed = 0;
+    backend_conn_info.max_bufer_size = READ_BUF_SIZE;
+    backend_conn_info.read_buf = malloc(sizeof(char) * READ_BUF_SIZE);
 
     proxy_handler->backend_info = backend_conn_info;
     proxy_handler->backend_info.backend_handlers->on_read = on_backend_read_event;
