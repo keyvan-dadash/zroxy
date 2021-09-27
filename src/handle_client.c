@@ -12,6 +12,7 @@
 
 #include "defines.h"
 #include "connections.h"
+#include "net/utils.h"
 
 int handle_client_connection(int client_sock, char *backend_host, char *backend_port)
 {
@@ -58,6 +59,8 @@ int handle_client_connection(int client_sock, char *backend_host, char *backend_
     }
 
     freeaddrinfo(addrs);
+
+    make_socket_nonblock(backend_socket_fd);
 
     make_proxy_connection(client_sock, backend_socket_fd);
 
