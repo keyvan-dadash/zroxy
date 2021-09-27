@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-#define MINIMUM_LOG_LEVEL 4
+#define MINIMUM_LOG_LEVEL 6
 
 
 #define FATAL_ERROR_LOG_LEVEL 1

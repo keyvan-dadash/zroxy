@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "defines.h"
 #include "handle_client.h"
@@ -44,13 +45,13 @@ int main(int argc, char *argv[])
     memset(&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_family = AF_INET;
-    hints.ai_protocol = SOCK_STREAM;
+    hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    getaddrinfo_error = getaddrinfo(backend_address, backend_port_char, &hints, &addrs);
+    getaddrinfo_error = getaddrinfo(NULL, server_port_char, &hints, &addrs);
 
     if (getaddrinfo_error != 0) {
-        fprintf(stderr, "cannot connect to backend: %s\n", gai_strerror(getaddrinfo_error));
+        fprintf(stderr, "cannot find backend: %s\n", gai_strerror(getaddrinfo_error));
         exit(-1);
     } 
 
@@ -66,27 +67,28 @@ int main(int argc, char *argv[])
         so_reuseaddr = 1;
         setsockopt(server_sock, SOL_SOCKET, SO_REUSEADDR, &so_reuseaddr, sizeof(so_reuseaddr));
 
-        if (bind(server_sock, addrs_iter->ai_addr, addrs_iter->ai_addrlen))
+        if (bind(server_sock, addrs_iter->ai_addr, addrs_iter->ai_addrlen) == 0)
             break;
 
         close(server_sock);
     }
 
     if (addrs_iter == NULL) {
-        fprintf(stderr, "cannot setup server");
+        fprintf(stderr, "cannot setup server proper reason %s\n", strerror(errno));
         exit(-1);
     }
 
     freeaddrinfo(addrs);
 
     if (listen(server_sock, MAX_LISTEN_SIZE) == -1) {
-        fprintf(stderr, "cannot listen");
+        fprintf(stderr, "cannot listen\n");
         exit(-1);
     }
 
-    fprintf(stdout, "Listen on port: %s", server_port_char);
+    fprintf(stdout, "Listen on port: %s\n", server_port_char);
 
 
+    epoll_init();
 
     backend_addrs_t backend_addrs;
 

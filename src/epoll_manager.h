@@ -45,6 +45,7 @@ typedef struct
 
     char *read_buf;
     int32_t max_bufer_size;
+    int32_t buffer_ptr;
 } client_connection_info_t;
 
 typedef struct
@@ -56,6 +57,7 @@ typedef struct
 
     char *read_buf;
     int32_t max_bufer_size;
+    int32_t buffer_ptr;
 } backend_connection_info_t;
 
 

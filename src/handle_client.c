@@ -27,7 +27,7 @@ void handle_client_connection(int client_sock, char *backend_host, char *backend
     memset(&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_family = AF_INET;
-    hints.ai_protocol = SOCK_STREAM;
+    hints.ai_socktype = SOCK_STREAM;
 
     getaddrinfo_error = getaddrinfo(backend_host, backend_port, &hints, &addrs);
 

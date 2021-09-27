@@ -25,13 +25,16 @@ void accept_new_conn(int listen_fd, backend_addrs_t *addrs)
 
         new_client_sock_fd = accept(listen_fd, NULL, NULL);
 
-        make_socket_nonblock(new_client_sock_fd);
-
-        if ( (errno == EAGAIN) || (errno == EWOULDBLOCK) )
+        if (new_client_sock_fd == -1 && ((errno == EAGAIN) || (errno == EWOULDBLOCK)) )
             break;
-        else
-            LOG_FATAL(-1, "Something bad happend with accepting new client");
+        else if(new_client_sock_fd == -1)
+            LOG_FATAL(-1, "Something bad happend with accepting new client in listen_fd(%d) with error: %s\n", 
+                            listen_fd, strerror(errno));
 
+        LOG_INFO("accept new connection with fd(%d)\n", new_client_sock_fd);
+
+        
+        make_socket_nonblock(new_client_sock_fd);
         handle_client_connection(new_client_sock_fd, addrs->backend_host, addrs->backend_port);
     }
 }
@@ -50,19 +53,19 @@ void handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
 
     //TODO: free backend_addrs_t buffers
 
-    if (events & (EPOLLHUP || EPOLLERR)) {//Error or close
-        LOG_WARNING("Listen fd is going to close and remove from epoll");
+    if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
+        // LOG_WARNING("Listen fd is going to close and remove from epoll");
         remove_fd_from_epoll(listen_fd);
         close(listen_fd);
         free_listen_fd_requirments(ptr);
         return;
     }
 
-    if (events & EPOLLIN) { //Write ready
+    if (events & EPOLLIN) { //READ ready
         accept_new_conn(listen_fd, addrs);
     }
 
-    if (events & EPOLLOUT) { //Read ready
+    if (events & EPOLLOUT) { //Write ready
         LOG_WARNING("Listen fd is in out mode???");
     }
 }
@@ -76,8 +79,7 @@ void start_server(int listen_fd, backend_addrs_t *addrs)
     listen_fd_handler->sock_fd = listen_fd;
     listen_fd_handler->free_params = free_listen_fd_requirments;
 
-
-    add_handler_to_epoll(listen_fd_handler, EPOLLIN || EPOLLERR || EPOLLHUP);
+    add_handler_to_epoll(listen_fd_handler, EPOLLIN | EPOLLERR | EPOLLHUP);
 
     event_loop();
 }
