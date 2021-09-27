@@ -10,6 +10,8 @@
 
 #include "defines.h"
 #include "handle_client.h"
+#include "net/utils.h"
+#include "server.h"
 
 int main(int argc, char *argv[])
 {
@@ -87,14 +89,13 @@ int main(int argc, char *argv[])
     fprintf(stdout, "Listen on port: %s", server_port_char);
 
 
-    while (1) {
 
-        clien_sock = accept(server_sock, NULL, NULL);
+    backend_addrs_t backend_addrs;
 
-        if (clien_sock == -1) {
-            fprintf(stderr, "Currently cannot accept");
-        }
+    backend_addrs.backend_host = backend_address;
+    backend_addrs.backend_port = backend_port_char;
 
-        handle_client_connection(clien_sock, backend_address, backend_port_char);
-    }
+    make_socket_nonblock(server_sock);
+
+    start_server(server_sock, &backend_addrs);
 }

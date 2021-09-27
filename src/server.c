@@ -38,10 +38,10 @@ void accept_new_conn(int listen_fd, backend_addrs_t *addrs)
 
 void free_listen_fd_requirments(void *ptr)
 {
-    backend_addrs_t *addrs = (backend_addrs_t*)ptr;
+    // backend_addrs_t *addrs = (backend_addrs_t*)ptr;
 
-    free(addrs->backend_host);
-    free(addrs->backend_port);
+    // free(addrs->backend_host);
+    // free(addrs->backend_port);
 }
 
 void handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
