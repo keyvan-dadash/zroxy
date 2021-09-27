@@ -13,6 +13,7 @@
 
 #include "connections.h"
 #include "epoll_manager.h"
+#include "client_callbacks.h"
 
 
 //TODO: add call back for each client and backend sepratly in handler
@@ -27,7 +28,11 @@ handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_f
     client_connection_info_t client_conn_info;
     client_conn_info.client_sock_fd = client_sock_fd;
     client_conn_info.is_client_closed = 0;
+
     proxy_handler->client_info = client_conn_info;
+    proxy_handler->client_info.client_handlers->on_read = on_client_read_event;
+    proxy_handler->client_info.client_handlers->on_write = on_client_write_event;
+    proxy_handler->client_info.client_handlers->on_close = on_client_close_event;
 
     handler_t *handler = malloc(sizeof(handler_t));
     handler->sock_fd = client_sock_fd;
@@ -42,7 +47,11 @@ handler_t* make_backend_handler(proxy_handler_t *proxy_handler, int backend_sock
     backend_connection_info_t backend_conn_info;
     backend_conn_info.backend_sock_fd = backend_sock_fd;
     backend_conn_info.is_backend_closed = 0;
+
     proxy_handler->backend_info = backend_conn_info;
+    // proxy_handler->backend_info.backend_handlers->on_read = on_client_read_event;
+    // proxy_handler->backend_info.backend_handlers->on_write = on_client_write_event;
+    // proxy_handler->backend_info.backend_handlers->on_close = on_client_close_event;
 
     handler_t *handler = malloc(sizeof(handler_t));
     handler->sock_fd = backend_sock_fd;

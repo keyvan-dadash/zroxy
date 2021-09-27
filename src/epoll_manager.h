@@ -19,9 +19,6 @@ extern int epoll_fd;
 
 typedef struct
 {
-    char *write_buf;
-    char *read_buf;
-
     void *on_read;
     void *on_write;
     void *on_close;
@@ -30,9 +27,6 @@ typedef struct
 
 typedef struct
 {
-    char *write_buf;
-    char *read_buf;
-
     void *on_read;
     void *on_write;
     void *on_close;
@@ -45,6 +39,9 @@ typedef struct
     int8_t is_client_closed;
     uint32_t client_events;
     client_handlers_t *client_handlers;
+
+    char *read_buf;
+    int32_t max_bufer_size;
 } client_connection_info_t;
 
 typedef struct
@@ -53,6 +50,9 @@ typedef struct
     int8_t is_backend_closed;
     uint32_t backend_events;
     backend_handlers_t *backend_handlers;
+
+    char *read_buf;
+    int32_t max_bufer_size;
 } backend_connection_info_t;
 
 
