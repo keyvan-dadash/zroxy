@@ -6,11 +6,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-
+#include <unistd.h>
 
 #include "defines.h"
 #include "handle_client.h"
-#include "net/utils.h"
+#include "netutils.h"
 #include "server.h"
 
 int main(int argc, char *argv[])
@@ -26,8 +26,6 @@ int main(int argc, char *argv[])
     int getaddrinfo_error;
 
     int server_sock;
-    int clien_sock;
-
 
     int so_reuseaddr;
 

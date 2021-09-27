@@ -18,7 +18,7 @@ extern int epoll_fd;
 // } connection_params_t;
 
 
-typedef (*proxy_callback_func)(proxy_handler_t*);
+typedef void (*proxy_callback_func)(void*);
 
 typedef struct
 {
@@ -82,7 +82,7 @@ typedef struct
 
 void epoll_init();
 
-void add_handler_to_epoll(const handler_t *const handler, uint32_t mask);
+void add_handler_to_epoll(handler_t *handler, uint32_t mask);
 
 void remove_fd_from_epoll(int sock_fd);
 

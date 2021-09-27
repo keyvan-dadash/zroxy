@@ -10,12 +10,12 @@
 #include <netdb.h>
 #include <errno.h>
 #include <sys/epoll.h>
-
+#include <unistd.h>
 
 #include "server.h"
 #include "logs.h"
 #include "handle_client.h"
-#include "net/utils.h"
+#include "netutils.h"
 
 void accept_new_conn(int listen_fd, backend_addrs_t *addrs)
 {

@@ -5,6 +5,6 @@
 
 
 
-int handle_client_connection(int client_sock, char *backend_host, char *backend_port);
+void handle_client_connection(int client_sock, char *backend_host, char *backend_port);
 
 #endif /* HANDLE_CLIENT_H */

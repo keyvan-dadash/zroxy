@@ -8,13 +8,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-
+#include <unistd.h>
 
 #include "defines.h"
 #include "connections.h"
-#include "net/utils.h"
+#include "netutils.h"
 
-int handle_client_connection(int client_sock, char *backend_host, char *backend_port)
+void handle_client_connection(int client_sock, char *backend_host, char *backend_port)
 {
 
     struct addrinfo hints;
@@ -24,9 +24,6 @@ int handle_client_connection(int client_sock, char *backend_host, char *backend_
 
     int backend_socket_fd;
 
-    char buf[READ_BUF_SIZE];
-    int nbytes;
-
     memset(&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_family = AF_INET;
@@ -34,7 +31,7 @@ int handle_client_connection(int client_sock, char *backend_host, char *backend_
 
     getaddrinfo_error = getaddrinfo(backend_host, backend_port, &hints, &addrs);
 
-    if (getaddrinfo != 0) {
+    if (getaddrinfo_error != 0) {
         fprintf(stderr, "cannot connect to backend: %s\n", gai_strerror(getaddrinfo_error));
         exit(-1);
     } 
@@ -63,5 +60,4 @@ int handle_client_connection(int client_sock, char *backend_host, char *backend_
     make_socket_nonblock(backend_socket_fd);
 
     make_proxy_connection(client_sock, backend_socket_fd);
-
 }

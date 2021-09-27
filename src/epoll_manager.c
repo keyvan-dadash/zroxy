@@ -26,7 +26,7 @@ void epoll_init()
     }
 }
 
-void add_handler_to_epoll(const handler_t *const handler, uint32_t mask)
+void add_handler_to_epoll(handler_t *handler, uint32_t mask)
 {
     struct epoll_event event;
     event.data.fd = handler->sock_fd;
@@ -45,8 +45,6 @@ void remove_fd_from_epoll(int sock_fd)
 
 void event_loop(int server_fd)
 {
-    struct epoll_event event;
-
     struct epoll_event events[MAX_EVENTS];
 
     while (1) {
@@ -56,7 +54,7 @@ void event_loop(int server_fd)
 
             handler_t *handler = (handler_t*) events[i].data.ptr;
 
-            handler->callback(event.data.fd, event.events, handler->params);
+            handler->callback(events[i].data.fd, events[i].events, handler->params);
         }
     }
 }
