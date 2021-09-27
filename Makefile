@@ -1,13 +1,3 @@
-# CC = gcc
-# FLAGS = -g -Wall -Werror
-# OBJ = *.o
-
-# zroxy: $(OBJ)
-# 	$(CC) -o $@ $^ $(FLAGS)
-
-# clean:
-# 	rm -rf *.o
-
 
 
 zroxy:
@@ -47,7 +37,11 @@ $(foreach s,$(sources),$(foreach o,$(filter %$(basename $(notdir $s)).o,$(object
 $(objects): ; $(if $(wildcard $(@D)),,mkdir -p $(@D) &&) gcc -c $< -o $@ -Wall -Werror -g
 
 # Compile all sources.
+build: $(objects)
+
 zroxy: $(objects)
+	gcc -o $(build_root)/$@ -Wall -Werror -g $^
+	
 clean: ; rm -rf $(build_root)
 
 .PHONY: clean zroxy
