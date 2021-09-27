@@ -26,16 +26,15 @@ void epoll_init()
     }
 }
 
-void add_fd_to_epoll(handler_t *handler, uint32_t event_mask)
+void add_handler_to_epoll(const handler_t *const handler, uint32_t mask)
 {
     struct epoll_event event;
-
     event.data.fd = handler->sock_fd;
-    event.events = event_mask;
+    event.events = mask;
     event.data.ptr = handler;
 
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, event.data.fd, &event) == -1) {
-        LOG_ERROR("Cannot add fd(%d) to epoll set", event.data.fd);
+        LOG_ERROR("Cannot add client fd(%d) to epoll set", event.data.fd);
     }
 }
 
@@ -57,7 +56,7 @@ void event_loop(int server_fd)
 
             handler_t *handler = (handler_t*) events[i].data.ptr;
 
-            handler->handle(event.events);
+            handler->callback(event.data.fd, event.events, handler->params);
         }
     }
 }
