@@ -7,11 +7,12 @@
 #include "epoll_manager.h"
 
 
-void on_client_read_event(client_connection_info_t *client_handler, backend_connection_info_t *backend_handler);
+void on_client_read_event(proxy_handler_t *proxy_obj);
 
-void on_client_write_event(client_connection_info_t *client_handler, backend_connection_info_t *backend_handler);
+void on_client_write_event(proxy_handler_t *proxy_obj);
 
-void on_client_close_event(client_connection_info_t *client_handlers);
+void on_client_close_event(proxy_handler_t *proxy_obj);
 
+void client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr);
 
 #endif /* CLIENT_CALLBACKS_H */

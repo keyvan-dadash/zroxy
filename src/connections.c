@@ -24,6 +24,23 @@ void free_proxy_handler(proxy_handler_t *proxy_obj)
     free(proxy_obj);
 }
 
+void free_client_requirments(void *ptr)
+{
+    client_connection_info_t client = ((proxy_handler_t*)ptr)->client_info;
+    backend_connection_info_t backend = ((proxy_handler_t*)ptr)->backend_info;
+    free(client.read_buf);
+    if (client.is_client_closed && backend.is_backend_closed)
+        free_proxy_handler((proxy_handler_t*)ptr);
+}
+
+void free_backend_requirments(void *ptr)
+{
+    backend_connection_info_t backend = ((proxy_handler_t*)ptr)->backend_info;
+    client_connection_info_t client = ((proxy_handler_t*)ptr)->client_info;
+    free(backend.read_buf);
+    if (client.is_client_closed && backend.is_backend_closed)
+        free_proxy_handler((proxy_handler_t*)ptr);
+}
 
 handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_fd)
 {
@@ -41,7 +58,8 @@ handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_f
     handler_t *handler = malloc(sizeof(handler_t));
     handler->sock_fd = client_sock_fd;
     handler->params = proxy_handler;
-    handler->free_params = free_proxy_handler;
+    handler->free_params = free_client_requirments;
+    handler->callback = client_on_event_callback;
 
     return handler;
 }
@@ -62,7 +80,8 @@ handler_t* make_backend_handler(proxy_handler_t *proxy_handler, int backend_sock
     handler_t *handler = malloc(sizeof(handler_t));
     handler->sock_fd = backend_sock_fd;
     handler->params = proxy_handler;
-    handler->free_params = free_proxy_handler;
+    handler->free_params = free_backend_requirments;
+    handler->callback = backend_on_event_callback;
 
     return handler;
 }
@@ -75,6 +94,6 @@ void make_proxy_connection(int client_sock_fd, int backend_sock_fd)
     handler_t *backend_handler = make_client_handler(proxy_obj, backend_sock_fd);
 
 
-    add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP);
-    add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP);
+    add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR);
+    add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR);
 }

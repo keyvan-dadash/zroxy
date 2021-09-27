@@ -11,6 +11,7 @@
 
 
 #include "defines.h"
+#include "connections.h"
 
 int handle_client_connection(int client_sock, char *backend_host, char *backend_port)
 {
@@ -58,10 +59,6 @@ int handle_client_connection(int client_sock, char *backend_host, char *backend_
 
     freeaddrinfo(addrs);
 
-    while (nbytes = recv(client_sock, buf, READ_BUF_SIZE, 0)) {
-        send(client_sock, buf, READ_BUF_SIZE, 0);
-    }
-
-    close(backend_socket_fd);
+    make_proxy_connection(client_sock, backend_socket_fd);
 
 }

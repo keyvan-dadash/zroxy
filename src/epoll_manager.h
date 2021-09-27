@@ -17,19 +17,22 @@ extern int epoll_fd;
 //     char *backend_port;
 // } connection_params_t;
 
+
+typedef (*proxy_callback_func)(proxy_handler_t*);
+
 typedef struct
 {
-    void *on_read;
-    void *on_write;
-    void *on_close;
+    proxy_callback_func on_read;
+    proxy_callback_func on_write;
+    proxy_callback_func on_close;
 } client_handlers_t;
 
 
 typedef struct
 {
-    void *on_read;
-    void *on_write;
-    void *on_close;
+    proxy_callback_func on_read;
+    proxy_callback_func on_write;
+    proxy_callback_func on_close;
 } backend_handlers_t;
 
 

@@ -14,8 +14,11 @@
 #include "client_callbacks.h"
 
 
-void on_client_read_event(client_connection_info_t *client_info, backend_connection_info_t *backend_info)
+void on_client_read_event(proxy_handler_t *proxy_obj)
 {
+    client_connection_info_t *client_info = &(proxy_obj->client_info);
+    backend_connection_info_t *backend_info = &(proxy_obj->backend_info);
+
     int nbytes;
     int error;
 
@@ -40,8 +43,11 @@ void on_client_read_event(client_connection_info_t *client_info, backend_connect
     }
 }
 
-void on_client_write_event(client_connection_info_t *client_info, backend_connection_info_t *backend_info)
+void on_client_write_event(proxy_handler_t *proxy_obj)
 {
+    client_connection_info_t *client_info = &(proxy_obj->client_info);
+    backend_connection_info_t *backend_info = &(proxy_obj->backend_info);
+
     int nbytes;
     int error;
 
@@ -73,9 +79,32 @@ void on_client_write_event(client_connection_info_t *client_info, backend_connec
     // }
 }
 
-void on_client_close_event(client_connection_info_t *client_info)
+void on_client_close_event(proxy_handler_t *proxy_obj)
 {
+    client_connection_info_t *client_info = &(proxy_obj->client_info);
+
     remove_fd_from_epoll(client_info->client_sock_fd);
     client_info->is_client_closed = 1;
     close(client_info->client_sock_fd);
+}
+
+
+
+void client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
+{
+    proxy_handler_t *proxy_obj = (proxy_handler_t*)ptr;
+
+
+    if (events & (EPOLLHUP || EPOLLERR)) {//Error or close
+        proxy_obj->client_info.client_handlers->on_close(proxy_obj);
+        return;
+    }
+
+    if (events & EPOLLIN) { //Write ready
+        proxy_obj->client_info.client_handlers->on_write(proxy_obj);
+    }
+
+    if (events & EPOLLOUT) { //Read ready
+        proxy_obj->client_info.client_handlers->on_read(proxy_obj);
+    }
 }
