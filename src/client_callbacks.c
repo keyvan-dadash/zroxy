@@ -14,7 +14,7 @@
 #include "defines.h"
 #include "client_callbacks.h"
 #include "logs.h"
-
+#include "io_helper.h"
 
 //TODO: some refactor on wrteing and reading
 
@@ -31,17 +31,22 @@ void on_client_read_event(void *ptr)
         client_info->max_bufer_size = ((client_info->max_bufer_size - 1) * 2 + 1);
     }
 
+    read_io_req_t read_req;
 
-    nbytes = recv(client_info->client_sock_fd, 
-                           client_info->read_buf, 
-                           client_info->max_bufer_size - 1, 0);
-    
-    if (nbytes == -1 && ((errno == EAGAIN) || (errno == EWOULDBLOCK)))
+    read_req.req_fd = client_info->client_sock_fd;
+    read_req.buffer = client_info->read_buf;
+    read_req.maximum_read_buffer_size = client_info->max_bufer_size - 1;
+    read_req.flags = 0;
+
+    nbytes = read_socket_non_block(&read_req);
+
+    if (nbytes == 0) {
+        LOG_WARNING("we should going to close\n");
+    } else if (nbytes == WOULD_BLOCK) {
         return;
-    else if (nbytes == -1)
-        LOG_ERROR("Cannot read from client with fd(%d) becuase: %s\n", client_info->client_sock_fd, strerror(errno));
-
-    LOG_INFO("number of readed bytes is %d(client)\n", nbytes);
+    } else if (nbytes == UNKOWN_ERROR) {
+        LOG_ERROR("fuck in recv\n");
+    }
 
     client_info->buffer_ptr = nbytes;
     
@@ -53,20 +58,26 @@ void on_client_read_event(void *ptr)
 
     backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);
 
-    if (backend_info->backend_events & EPOLLOUT) {
-        nbytes = send(backend_info->backend_sock_fd, 
-                    client_info->read_buf, 
-                    client_info->buffer_ptr, 0);
+    if (is_writable_event(backend_info->backend_events)) {
 
-        if (nbytes == -1 && ((errno == EAGAIN) || (errno == EWOULDBLOCK)))
+        write_io_req_t write_req;
+        
+        write_req.req_fd = backend_info->backend_sock_fd;
+        write_req.buffer = client_info->read_buf;
+        write_req.send_nbytes = client_info->buffer_ptr;
+        write_req.clear_nbytes = client_info->max_bufer_size;
+        write_req.flags = 0;
+
+        nbytes = write_socket_non_block_and_clear_buf(&write_req);
+
+        if (nbytes == 0) {
+            LOG_WARNING("we should going to close\n");
+        } else if (nbytes == WOULD_BLOCK) {
             return;
-        else if (nbytes == -1)
-            LOG_ERROR("Cannot write to backend with client fd(%d) and backend fd(%d) becuase: %s\n", 
-                        client_info->client_sock_fd, backend_info->backend_sock_fd, strerror(errno));
+        } else if (nbytes == UNKOWN_ERROR) {
+            LOG_ERROR("fuck in send\n");
+        }
 
-        LOG_INFO("number of written bytes is %d(in recv client)\n", nbytes);
-
-        memset(client_info->read_buf, '\0', client_info->max_bufer_size);
         client_info->buffer_ptr = -1;
     }
 }
@@ -80,41 +91,26 @@ void on_client_write_event(void *ptr)
     client_connection_info_t *client_info = &( ((proxy_handler_t*)ptr)->client_info);
 
     int nbytes;
+    write_io_req_t write_req;
+        
+    write_req.req_fd = client_info->client_sock_fd;
+    write_req.buffer = backend_info->read_buf;
+    write_req.send_nbytes = backend_info->buffer_ptr;
+    write_req.clear_nbytes = backend_info->max_bufer_size;
+    write_req.flags = 0;
 
-    nbytes = send(client_info->client_sock_fd, 
-                backend_info->read_buf, 
-                backend_info->buffer_ptr, 0);
-    
-    if (nbytes == -1 && ((errno == EAGAIN) || (errno == EWOULDBLOCK)))
+    nbytes = write_socket_non_block_and_clear_buf(&write_req);
+
+    if (nbytes == 0) {
+        LOG_WARNING("we should going to close\n");
+    } else if (nbytes == WOULD_BLOCK) {
         return;
-    else if (nbytes == -1)
-        LOG_ERROR("Cannot write to client with client fd(%d) and backend fd(%d) becuase: %s\n", 
-                    client_info->client_sock_fd, backend_info->backend_sock_fd, strerror(errno));
+    } else if (nbytes == UNKOWN_ERROR) {
+        LOG_ERROR("fuck in send\n");
+    }
 
     LOG_INFO("number of written bytes is %d(in send client)\n", nbytes);
-
-    memset(backend_info->read_buf, '\0', backend_info->max_bufer_size);
     backend_info->buffer_ptr = -1;
-
-    // if (client_info->read_buf[client_info->max_bufer_size - 1] != '\0')
-    // {
-    //     client_info->read_buf = realloc(client_info->read_buf, client_info->max_bufer_size * 2);
-    //     memset((client_info->read_buf + client_info->max_bufer_size), '\0', client_info->max_bufer_size);
-    //     client_info->max_bufer_size *= 2;
-    // }
-
-
-    
-
-    // nbytes = recv(client_info->client_sock_fd, 
-    //                        client_info->read_buf, 
-    //                        client_info->max_bufer_size - 1, 0);
-    
-
-    // if (client_info->max_bufer_size - 2 == nbytes)
-    // {
-    //     client_info->read_buf[client_info->max_bufer_size - 1] == '1';
-    // }
 }
 
 void on_client_close_event(void *ptr)
@@ -140,11 +136,11 @@ void client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
         return;
     }
 
-    if (events & EPOLLIN) { //Read ready
+    if (is_readable_event(events)) { //Read ready
         proxy_obj->client_info.client_handlers->on_read(ptr);
     }
 
-    if (events & EPOLLOUT) { //Write ready
+    if (is_writable_event(events)) { //Write ready
         proxy_obj->client_info.client_handlers->on_write(ptr);
     }
 }
