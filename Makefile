@@ -3,6 +3,12 @@
 zroxy:
 clean:
 
+CC = gcc
+CFLAGS = -g -Wall -Werror
+INCLUDE_DIRS := -I/usr/local/include/luajit-2.1/ -I/usr/local/include
+LDFLAGS := -L/usr/local/lib 
+LIBS := -lluajit-5.1 -llua -ldl -lm
+
 src_root := src
 src_subdirs := 
 build_root := build
@@ -20,7 +26,7 @@ ifeq ($(src_subdirs),)
   sources := $(shell find $(src_root) -type f $(foreach s,$(source_suffixes),$(if $(findstring $s,$(firstword $(source_suffixes))),,-o) -name '*$s'))
 endif
 
-$(info sources=$(sources))
+$(info sources=(INCLUDE_DIRS))
 
 # Build source -> object file mapping.
 # We want map $(src_root) -> $(build_root) and copy directory structure 
@@ -34,13 +40,14 @@ $(foreach s,$(sources),$(foreach o,$(filter %$(basename $(notdir $s)).o,$(object
 # This is how we compile sources:
 # First check if directory for the target file exists. 
 # If it doesn't run 'mkdir' command.
-$(objects): ; $(if $(wildcard $(@D)),,mkdir -p $(@D) &&) gcc -c $< -o $@ -Wall -Werror -g
+$(objects): ; $(if $(wildcard $(@D)),,mkdir -p $(@D) &&) $(CC) -c $< -o $@ $(INCLUDE_DIRS) $(CFLAGS)
 
 # Compile all sources.
 build: $(objects)
 
-zroxy: $(objects)
-	gcc -o $(build_root)/$@ -Wall -Werror -g $^
+zroxy:
+	mkdir -p $(build_root)
+	$(CC) $(sources) $(CFLAGS) $(INCLUDE_DIRS) $(LDFLAGS) $(LIBS) -o $(build_root)/$@ $^
 	
 clean: ; rm -rf $(build_root)
 

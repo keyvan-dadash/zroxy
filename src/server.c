@@ -71,7 +71,7 @@ void handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
 
 void start_server(int listen_fd, backend_addrs_t *addrs)
 {
-    handler_t *listen_fd_handler = malloc(sizeof(handler_t));
+    handler_t *listen_fd_handler = (handler_t *)malloc(sizeof(handler_t));
     listen_fd_handler->callback = handle_accepting_connections;
     listen_fd_handler->params = addrs;
     listen_fd_handler->sock_fd = listen_fd;

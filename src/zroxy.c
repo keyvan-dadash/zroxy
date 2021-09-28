@@ -13,13 +13,11 @@
 #include "handle_client.h"
 #include "netutils.h"
 #include "server.h"
+#include "configure.h"
+
 
 int main(int argc, char *argv[])
 {
-    char *server_port_char;
-    char *backend_address;
-    char *backend_port_char;
-
 
     struct addrinfo hints;
     struct addrinfo *addrs;
@@ -30,17 +28,14 @@ int main(int argc, char *argv[])
 
     int so_reuseaddr;
 
-    if (argc != 4) {
+    if (argc != 2) {
         fprintf(stderr,
-            "Usage: %s, <server_port> <backend_addr> <backend_port>\n",
+            "Usage: %s, <config_file>\n",
             argv[0]);
         exit(-1);
     }
 
-
-    server_port_char = argv[1];
-    backend_address = argv[2];
-    backend_port_char = argv[3];
+    connection_configs_t config = get_configs_from_file(argv[1]);
 
     memset(&hints, 0, sizeof(struct addrinfo));
 
@@ -48,7 +43,7 @@ int main(int argc, char *argv[])
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    getaddrinfo_error = getaddrinfo(NULL, server_port_char, &hints, &addrs);
+    getaddrinfo_error = getaddrinfo(NULL, config.server_port_char, &hints, &addrs);
 
     if (getaddrinfo_error != 0) {
         fprintf(stderr, "cannot find backend: %s\n", gai_strerror(getaddrinfo_error));
@@ -85,15 +80,15 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    fprintf(stdout, "Listen on port: %s\n", server_port_char);
+    fprintf(stdout, "Listen on port: %s\n", config.server_port_char);
 
 
     epoll_init();
 
     backend_addrs_t backend_addrs;
 
-    backend_addrs.backend_host = backend_address;
-    backend_addrs.backend_port = backend_port_char;
+    backend_addrs.backend_host = config.backend_address;
+    backend_addrs.backend_port = config.backend_port_char;
 
     make_socket_nonblock(server_sock);
 

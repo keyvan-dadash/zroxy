@@ -22,7 +22,7 @@ linklist_of_free_obj_t *entry = NULL;
 
 void add_block_to_link_list(void *ptr)
 {
-    linklist_of_free_obj_t *new_entry = malloc(sizeof(linklist_of_free_obj_t));
+    linklist_of_free_obj_t *new_entry = (linklist_of_free_obj_t *)malloc(sizeof(linklist_of_free_obj_t));
     new_entry->block = ptr;
     new_entry->next = entry;
     entry = new_entry;
