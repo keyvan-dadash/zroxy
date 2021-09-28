@@ -105,10 +105,6 @@ void on_backend_close_event(void *ptr)
     close(backend_info->backend_sock_fd);
 
     add_block_to_link_list(((proxy_handler_t*)ptr)->backend_handler_ptr);
-
-    // handler_t *back_handler = (handler_t*)(((proxy_handler_t*)ptr)->backend_handler_ptr);
-
-    // back_handler->set_free = 1;
 }
 
 

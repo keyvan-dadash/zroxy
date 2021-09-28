@@ -16,9 +16,6 @@
 #include "client_callbacks.h"
 #include "backend_callbacks.h"
 
-
-//TODO: add call back for each client and backend sepratly in handler
-
 void free_proxy_handler(proxy_handler_t *proxy_obj)
 {
     free(proxy_obj);

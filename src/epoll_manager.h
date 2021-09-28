@@ -11,13 +11,6 @@
 extern int epoll_fd;
 
 
-// typedef struct 
-// {
-//     char *backend_addr;
-//     char *backend_port;
-// } connection_params_t;
-
-
 typedef void (*proxy_callback_func)(void*);
 
 typedef struct

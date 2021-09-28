@@ -84,10 +84,6 @@ void event_loop(int server_fd)
 
             handler->callback(handler->sock_fd, events[i].events, handler->params);
 
-            // if (handler->set_free) {
-            //     LOG_INFO("fuckkkkkkkkkkkkkkkkkkkkkkkkkkk1\n");
-            //     handler->free_params(handler->params);
-            // }
         }
 
         linklist_of_free_obj_t *local_entry;

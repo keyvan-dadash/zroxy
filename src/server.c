@@ -51,8 +51,6 @@ void handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
 {
     backend_addrs_t *addrs = (backend_addrs_t*)ptr;
 
-    //TODO: free backend_addrs_t buffers
-
     if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
         // LOG_WARNING("Listen fd is going to close and remove from epoll");
         remove_fd_from_epoll(listen_fd);

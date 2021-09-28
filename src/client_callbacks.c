@@ -16,7 +16,6 @@
 #include "logs.h"
 #include "io_helper.h"
 
-//TODO: some refactor on wrteing and reading
 
 void on_client_read_event(void *ptr)
 {
@@ -106,10 +105,6 @@ void on_client_close_event(void *ptr)
     close(client_info->client_sock_fd);
 
     add_block_to_link_list(((proxy_handler_t*)ptr)->client_handler_ptr);
-
-    // handler_t *client_handler = (handler_t*)(((proxy_handler_t*)ptr)->client_handler_ptr);
-
-    // client_handler->set_free = 1;
 }
 
 
