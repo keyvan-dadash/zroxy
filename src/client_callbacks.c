@@ -42,6 +42,7 @@ void on_client_read_event(void *ptr)
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
+        on_client_close_event(ptr);
     } else if (nbytes == WOULD_BLOCK) {
         return;
     } else if (nbytes == UNKOWN_ERROR) {
@@ -59,26 +60,7 @@ void on_client_read_event(void *ptr)
     backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);
 
     if (is_writable_event(backend_info->backend_events)) {
-
-        write_io_req_t write_req;
-        
-        write_req.req_fd = backend_info->backend_sock_fd;
-        write_req.buffer = client_info->read_buf;
-        write_req.send_nbytes = client_info->buffer_ptr;
-        write_req.clear_nbytes = client_info->max_bufer_size;
-        write_req.flags = 0;
-
-        nbytes = write_socket_non_block_and_clear_buf(&write_req);
-
-        if (nbytes == 0) {
-            LOG_WARNING("we should going to close\n");
-        } else if (nbytes == WOULD_BLOCK) {
-            return;
-        } else if (nbytes == UNKOWN_ERROR) {
-            LOG_ERROR("fuck in send\n");
-        }
-
-        client_info->buffer_ptr = -1;
+        backend_info->backend_handlers->on_write(ptr);
     }
 }
 
@@ -103,6 +85,7 @@ void on_client_write_event(void *ptr)
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
+        on_client_close_event(ptr);
     } else if (nbytes == WOULD_BLOCK) {
         return;
     } else if (nbytes == UNKOWN_ERROR) {
