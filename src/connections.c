@@ -47,9 +47,10 @@ handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_f
     client_connection_info_t client_conn_info;
     client_conn_info.client_sock_fd = client_sock_fd;
     client_conn_info.is_client_closed = 0;
-    client_conn_info.max_bufer_size = READ_BUF_SIZE;
-    client_conn_info.read_buf = malloc(sizeof(char) * READ_BUF_SIZE);
+    client_conn_info.max_bufer_size = READ_BUF_SIZE + 1;
+    client_conn_info.read_buf = malloc(sizeof(char) * client_conn_info.max_bufer_size);
     client_conn_info.buffer_ptr = -1;
+    client_conn_info.client_events = 0;
 
     proxy_handler->client_info = client_conn_info;
 
@@ -72,9 +73,10 @@ handler_t* make_backend_handler(proxy_handler_t *proxy_handler, int backend_sock
     backend_connection_info_t backend_conn_info;
     backend_conn_info.backend_sock_fd = backend_sock_fd;
     backend_conn_info.is_backend_closed = 0;
-    backend_conn_info.max_bufer_size = READ_BUF_SIZE;
-    backend_conn_info.read_buf = malloc(sizeof(char) * READ_BUF_SIZE);
+    backend_conn_info.max_bufer_size = READ_BUF_SIZE + 1;
+    backend_conn_info.read_buf = malloc(sizeof(char) * backend_conn_info.max_bufer_size);
     backend_conn_info.buffer_ptr = -1;
+    backend_conn_info.backend_events = 0;
 
     proxy_handler->backend_info = backend_conn_info;
 
@@ -100,6 +102,6 @@ void make_proxy_connection(int client_sock_fd, int backend_sock_fd)
     handler_t *backend_handler = make_backend_handler(proxy_obj, backend_sock_fd);
 
 
-    add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR);
-    add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR);
+    add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
+    add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
 }
