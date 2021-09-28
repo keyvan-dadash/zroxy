@@ -59,7 +59,7 @@ void on_client_read_event(void *ptr)
 
     backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);
 
-    if (is_writable_event(backend_info->backend_events)) {
+    if (!backend_info->is_backend_closed && is_writable_event(backend_info->backend_events)) {
         backend_info->backend_handlers->on_write(ptr);
     }
 }
@@ -104,6 +104,12 @@ void on_client_close_event(void *ptr)
     LOG_INFO("Client fd(%d) closed the connection\n", client_info->client_sock_fd);
     client_info->is_client_closed = 1;
     close(client_info->client_sock_fd);
+
+    add_block_to_link_list(((proxy_handler_t*)ptr)->client_handler_ptr);
+
+    // handler_t *client_handler = (handler_t*)(((proxy_handler_t*)ptr)->client_handler_ptr);
+
+    // client_handler->set_free = 1;
 }
 
 
@@ -112,6 +118,9 @@ void client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
 {
     proxy_handler_t *proxy_obj = (proxy_handler_t*)ptr;
     proxy_obj->client_info.client_events = events;
+
+    if (proxy_obj->client_info.is_client_closed)
+        return;
 
 
     if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close

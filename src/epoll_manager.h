@@ -46,6 +46,7 @@ typedef struct
     char *read_buf;
     int32_t max_bufer_size;
     int32_t buffer_ptr;
+    int8_t set_free;
 } client_connection_info_t;
 
 typedef struct
@@ -58,6 +59,7 @@ typedef struct
     char *read_buf;
     int32_t max_bufer_size;
     int32_t buffer_ptr;
+    int8_t set_free;
 } backend_connection_info_t;
 
 
@@ -65,6 +67,9 @@ typedef struct
 {
     client_connection_info_t client_info;
     backend_connection_info_t backend_info;
+
+    void *client_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
+    void *backend_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
 } proxy_handler_t;
 
 
@@ -81,6 +86,16 @@ typedef struct
 } handler_t;
 
 
+
+typedef struct linklist_of_free_obj
+{
+    void* block;
+    struct linklist_of_free_obj* next;
+} linklist_of_free_obj_t;
+
+extern linklist_of_free_obj_t *entry;
+
+void add_block_to_link_list(void *ptr);
 
 void epoll_init();
 

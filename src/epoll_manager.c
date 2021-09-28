@@ -18,6 +18,16 @@
 
 int epoll_fd = -1;
 
+linklist_of_free_obj_t *entry = NULL;
+
+void add_block_to_link_list(void *ptr)
+{
+    linklist_of_free_obj_t *new_entry = malloc(sizeof(linklist_of_free_obj_t));
+    new_entry->block = ptr;
+    new_entry->next = entry;
+    entry = new_entry;
+}
+
 void epoll_init()
 {
     epoll_fd = epoll_create1(0);
@@ -73,6 +83,23 @@ void event_loop(int server_fd)
             handler_t *handler = (handler_t*) events[i].data.ptr;
 
             handler->callback(handler->sock_fd, events[i].events, handler->params);
+
+            // if (handler->set_free) {
+            //     LOG_INFO("fuckkkkkkkkkkkkkkkkkkkkkkkkkkk1\n");
+            //     handler->free_params(handler->params);
+            // }
+        }
+
+        linklist_of_free_obj_t *local_entry;
+
+        while (entry != NULL) { //free handler objects
+            handler_t *handler = (handler_t *)entry->block;
+            handler->free_params(handler->params);
+            LOG_INFO("fuckkkkkkkkkkkkkkkkkkkkkkkkkkk\n");
+            free(entry->block);
+            local_entry = entry->next;
+            free(entry);
+            entry = local_entry;
         }
     }
 }
