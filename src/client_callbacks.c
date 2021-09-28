@@ -34,8 +34,8 @@ void on_client_read_event(void *ptr)
     read_io_req_t read_req;
 
     read_req.req_fd = client_info->client_sock_fd;
-    read_req.buffer = client_info->read_buf;
-    read_req.maximum_read_buffer_size = client_info->max_bufer_size - 1;
+    read_req.buffer = client_info->read_buf + client_info->buffer_ptr;
+    read_req.maximum_read_buffer_size = READ_BUF_SIZE;
     read_req.flags = 0;
 
     nbytes = read_socket_non_block(&read_req);
@@ -49,7 +49,7 @@ void on_client_read_event(void *ptr)
         LOG_ERROR("fuck in recv\n");
     }
 
-    client_info->buffer_ptr = nbytes;
+    client_info->buffer_ptr += nbytes;
     
 
     if (client_info->max_bufer_size - 2 == nbytes)
@@ -67,7 +67,7 @@ void on_client_read_event(void *ptr)
 void on_client_write_event(void *ptr)
 {
     backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);
-    if (backend_info->buffer_ptr == -1)
+    if (backend_info->buffer_ptr == 0)
         return;
 
     client_connection_info_t *client_info = &( ((proxy_handler_t*)ptr)->client_info);
@@ -93,7 +93,7 @@ void on_client_write_event(void *ptr)
     }
 
     LOG_INFO("number of written bytes is %d(in send client)\n", nbytes);
-    backend_info->buffer_ptr = -1;
+    backend_info->buffer_ptr = 0;
 }
 
 void on_client_close_event(void *ptr)
