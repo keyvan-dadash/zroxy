@@ -63,6 +63,9 @@ typedef struct
 
     void *client_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
     void *backend_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
+    void *timer_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
+
+    int32_t timer_status_and_fd;
 } proxy_handler_t;
 
 

@@ -11,3 +11,6 @@ build/
 
 #ide
 .vscode/
+
+#configs
+config.lua

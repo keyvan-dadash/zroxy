@@ -14,6 +14,7 @@
 #include "backend_callbacks.h"
 #include "logs.h"
 #include "io_helper.h"
+#include "timers.h"
 
 void on_backend_read_event(void *ptr)
 {
@@ -113,7 +114,7 @@ void backend_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
     proxy_handler_t *proxy_obj = (proxy_handler_t*)ptr;
     proxy_obj->backend_info.backend_events = events;
 
-    if (proxy_obj->backend_info.is_backend_closed)
+    if (proxy_obj->backend_info.is_backend_closed || proxy_obj->timer_status_and_fd == TIMER_IS_UP)
         return;
 
 

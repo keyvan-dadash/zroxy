@@ -11,6 +11,8 @@
 #include <netdb.h>
 
 
+#include "timers.h"
+#include "timer_callback.h"
 #include "connections.h"
 #include "epoll_manager.h"
 #include "client_callbacks.h"
@@ -130,10 +132,16 @@ void make_proxy_connection(int client_sock_fd, int backend_sock_fd)
     handler_t *client_handler = make_client_handler(proxy_obj, client_sock_fd);
     handler_t *backend_handler = make_backend_handler(proxy_obj, backend_sock_fd);
 
+    int32_t tfd = create_timer_with_expiration(1, 0);
+    handler_t *timer_handler = make_timer_handler(tfd, proxy_obj);
+
     proxy_obj->client_handler_ptr = client_handler;
     proxy_obj->backend_handler_ptr = backend_handler;
+    proxy_obj->timer_handler_ptr = timer_handler;
+    proxy_obj->timer_status_and_fd = tfd;
 
 
     add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
     add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
+    add_handler_to_epoll(timer_handler, EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET);
 }
