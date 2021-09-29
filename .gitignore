@@ -12,5 +12,8 @@ build/
 #ide
 .vscode/
 
+#certificates
+cert/
+
 #configs
 config.lua
