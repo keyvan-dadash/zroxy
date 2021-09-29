@@ -14,6 +14,8 @@ typedef struct
     char *server_port_char;
     char *backend_address;
     char *backend_port_char;
+    char *certificate_path;
+    char *private_key_path;
 } connection_configs_t;
 
 

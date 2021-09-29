@@ -7,7 +7,7 @@ CC = gcc
 CFLAGS = -g -Wall -Werror
 INCLUDE_DIRS := -I/usr/local/include/luajit-2.1/ -I/usr/local/include
 LDFLAGS := -L/usr/local/lib 
-LIBS := -lluajit-5.1 -llua -ldl -lm
+LIBS := -lluajit-5.1 -llua -ldl -lm  -lssl -lcrypto
 
 src_root := src
 src_subdirs := 

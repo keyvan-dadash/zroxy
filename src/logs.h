@@ -5,6 +5,7 @@
 #define LOGS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MINIMUM_LOG_LEVEL 6
 

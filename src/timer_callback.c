@@ -8,7 +8,7 @@
 #include "timers.h"
 #include "timer_callback.h"
 
-
+//TODO: backend and client closed and timer sill alive
 
 handler_t* make_timer_handler(int32_t tfd, proxy_handler_t *proxy_handler)
 {

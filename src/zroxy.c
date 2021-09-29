@@ -9,11 +9,14 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include <openssl/ssl.h>
+
 #include "defines.h"
 #include "handle_client.h"
 #include "netutils.h"
 #include "server.h"
 #include "configure.h"
+#include "ssl_helper.h"
 
 
 int main(int argc, char *argv[])
@@ -36,6 +39,8 @@ int main(int argc, char *argv[])
     }
 
     connection_configs_t config = get_configs_from_file(argv[1]);
+    SSL_CTX *ctx = ssl_init();
+    ssl_load_certificates_and_private_keys(ctx, config.certificate_path, config.private_key_path);
 
     memset(&hints, 0, sizeof(struct addrinfo));
 

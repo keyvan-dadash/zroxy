@@ -24,10 +24,14 @@ connection_configs_t get_configs_from_file(char *filename)
     char *zroxy_port = strdup("zroxy_port");
     char *server_address = strdup("server_address");
     char *server_port = strdup("server_port");
+    char *certificate_path = strdup("certificate_path");
+    char *privkey_path = strdup("privkey_path");
 
     configs.server_port_char = get_string_option(L, zroxy_port);
     configs.backend_address = get_string_option(L, server_address);
     configs.backend_port_char = get_string_option(L, server_port);
+    configs.certificate_path = get_string_option(L, certificate_path);
+    configs.private_key_path = get_string_option(L, privkey_path);
 
     return configs;
 }

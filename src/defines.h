@@ -10,4 +10,6 @@
 
 #define MAX_EVENTS 10
 
+#define SSL_CIPHER "AES128-GCM-SHA256"
+
 #endif /* DEFINES_H */
