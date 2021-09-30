@@ -12,14 +12,27 @@
 typedef struct
 {
     char *server_port_char;
-    char *backend_address;
-    char *backend_port_char;
+} zxy_server_configs_t;
+
+
+typedef struct
+{
+    char *proxy_address;
+    char *proxy_port;
+} zxy_proxy_configs_t;
+
+typedef struct 
+{
     char *certificate_path;
     char *private_key_path;
-} connection_configs_t;
+} zxy_certificates_configs_t;
 
 
-connection_configs_t get_configs_from_file(char *filename);
+zxy_server_configs_t zxy_get_server_configs_from_file(char *filename);
+
+zxy_proxy_configs_t zxy_get_proxy_configs_from_file(char *filename);
+
+zxy_certificates_configs_t zxy_get_certificates_configs_from_file(char *filename);
 
 char* get_string_option(lua_State *L, char *variable_name);
 
