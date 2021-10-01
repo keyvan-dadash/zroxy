@@ -18,15 +18,17 @@
 #include "client_callbacks.h"
 #include "backend_callbacks.h"
 
-void free_proxy_handler(proxy_handler_t *proxy_obj)
+#include "connections/conntypes/proxy_types.h"
+
+void free_proxy_handler(zxy_proxy_connection_t *proxy_obj)
 {
     free(proxy_obj);
 }
 
 void free_client_requirments(void *ptr)
 {
-    backend_connection_info_t *backend = &( ((proxy_handler_t*)ptr)->backend_info );
-    client_connection_info_t *client = &( ((proxy_handler_t*)ptr)->client_info );
+    zxy_backend_base_t *backend = &( ((zxy_proxy_connection_t*)ptr)->backend_info );
+    zxy_client_base_t *client = &( ((zxy_proxy_connection_t*)ptr)->client_info );
     free(client->client_handlers);
 
     if (backend->set_free == 1) {
@@ -43,14 +45,14 @@ void free_client_requirments(void *ptr)
     printf("(free client) client set free is %d and back is %d\n", client->set_free, backend->set_free);
 
     if ( (backend->set_free != 0) ) {
-        free_proxy_handler((proxy_handler_t*)ptr);
+        free_proxy_handler((zxy_proxy_connection_t*)ptr);
     }
 }
 
 void free_backend_requirments(void *ptr)
 {
-    backend_connection_info_t *backend = &( ((proxy_handler_t*)ptr)->backend_info );
-    client_connection_info_t *client = &( ((proxy_handler_t*)ptr)->client_info );
+    zxy_backend_base_t *backend = &( ((zxy_proxy_connection_t*)ptr)->backend_info );
+    zxy_client_base_t *client = &( ((zxy_proxy_connection_t*)ptr)->client_info );
     free(backend->backend_handlers);
     
     if (client->set_free == 1) {
@@ -67,13 +69,13 @@ void free_backend_requirments(void *ptr)
     printf("(free back) client set free is %d and back is %d\n", client->set_free, backend->set_free);
 
     if ( (client->set_free != 0)  ) {
-        free_proxy_handler((proxy_handler_t*)ptr);
+        free_proxy_handler((zxy_proxy_connection_t*)ptr);
     }
 }
 
-handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_fd)
+handler_t* make_client_handler(zxy_proxy_connection_t *proxy_handler, int client_sock_fd)
 {
-    client_connection_info_t client_conn_info;
+    zxy_client_base_t client_conn_info;
     client_conn_info.client_sock_fd = client_sock_fd;
     client_conn_info.is_client_closed = 0;
     client_conn_info.max_bufer_size = READ_BUF_SIZE + 1;
@@ -98,9 +100,9 @@ handler_t* make_client_handler(proxy_handler_t *proxy_handler, int client_sock_f
     return handler;
 }
 
-handler_t* make_backend_handler(proxy_handler_t *proxy_handler, int backend_sock_fd)
+handler_t* make_backend_handler(zxy_proxy_connection_t *proxy_handler, int backend_sock_fd)
 {
-    backend_connection_info_t backend_conn_info;
+    zxy_backend_base_t backend_conn_info;
     backend_conn_info.backend_sock_fd = backend_sock_fd;
     backend_conn_info.is_backend_closed = 0;
     backend_conn_info.max_bufer_size = READ_BUF_SIZE + 1;
@@ -127,7 +129,7 @@ handler_t* make_backend_handler(proxy_handler_t *proxy_handler, int backend_sock
 
 void make_proxy_connection(int client_sock_fd, int backend_sock_fd)
 {
-    proxy_handler_t *proxy_obj = (proxy_handler_t *)malloc(sizeof(proxy_handler_t));
+    zxy_proxy_connection_t *proxy_obj = (zxy_proxy_connection_t *)malloc(sizeof(zxy_proxy_connection_t));
 
     handler_t *client_handler = make_client_handler(proxy_obj, client_sock_fd);
     handler_t *backend_handler = make_backend_handler(proxy_obj, backend_sock_fd);
