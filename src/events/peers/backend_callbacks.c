@@ -11,11 +11,10 @@
 #include <errno.h>
 
 #include "defines.h"
-#include "backend_callbacks.h"
-#include "logs.h"
-#include "io_helper.h"
-#include "timers.h"
-
+#include "events/peers/backend_callbacks.h"
+#include "logging/logs.h"
+#include "utils/io/io_helper.h"
+#include "utils/timer/timers.h"
 void on_backend_read_event(void *ptr)
 {
     backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);

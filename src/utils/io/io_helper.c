@@ -11,7 +11,7 @@
 #include "logs.h"
 
 
-int read_socket_non_block(read_io_req_t *io_req)
+int zxy_read_socket_non_block(zxy_read_io_req_t *io_req)
 {
     int nbytes = recv(io_req->req_fd, 
                         io_req->buffer, 
@@ -28,7 +28,7 @@ int read_socket_non_block(read_io_req_t *io_req)
     return nbytes;
 }
 
-int write_socket_non_block(write_io_req_t *io_req)
+int zxy_write_socket_non_block(zxy_write_io_req_t *io_req)
 {
     int nbytes = send(io_req->req_fd, 
                         io_req->buffer, 
@@ -46,7 +46,7 @@ int write_socket_non_block(write_io_req_t *io_req)
     return nbytes;
 }
 
-int write_socket_non_block_and_clear_buf(write_io_req_t *io_req)
+int zxy_write_socket_non_block_and_clear_buf(zxy_write_io_req_t *io_req)
 {
     int nbytes = send(io_req->req_fd, 
                         io_req->buffer, 
@@ -68,12 +68,12 @@ int write_socket_non_block_and_clear_buf(write_io_req_t *io_req)
 
 
 
-int8_t is_readable_event(u_int32_t event)
+int8_t zxy_is_readable_event(u_int32_t event)
 {
     return (event & EPOLLIN);
 }
 
-int8_t is_writable_event(u_int32_t event)
+int8_t zxy_is_writable_event(u_int32_t event)
 {
     return (event & EPOLLOUT);
 }
