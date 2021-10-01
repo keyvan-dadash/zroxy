@@ -33,6 +33,21 @@ typedef struct
     int8_t set_free;
 } zxy_connection_info_t;
 
+
+
+enum zxy_client_conn_type
+{
+    PLAIN_CONN,
+    SSL_CONN
+};
+
+enum zxy_backend_conn_type
+{
+    PLAIN_CONN,
+    SSL_CONN
+};
+
+
 typedef struct 
 {
     zxy_client_base_t *client;

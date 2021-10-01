@@ -13,6 +13,20 @@
 
 #include "utils/io/buffer_mamager.h"
 
+
+
+
+zxy_client_base_t* zxy_make_client_base_conn(void *params)
+{
+    zxy_client_base_t *client_base_conn = (zxy_client_base_t*)calloc(1, sizeof(zxy_client_base_t));
+
+    client_base_conn->params = params;
+
+    return client_base_conn;
+}
+
+
+
 zxy_client_conn_t* zxy_make_client_plain_conn(int sock_fd)
 {
     zxy_client_conn_t *client_conn = (zxy_client_conn_t*)calloc(1, sizeof(zxy_client_conn_t));
@@ -25,14 +39,12 @@ zxy_client_conn_t* zxy_make_client_plain_conn(int sock_fd)
     return client_conn;
 }
 
-zxy_client_base_t* zxy_make_client_base_conn(void *params)
+void zxy_set_up_client_plain_conn_callbacks(zxy_client_conn_t* client_conn)
 {
-    zxy_client_base_t *client_base_conn = (zxy_client_base_t*)calloc(1, sizeof(zxy_client_base_t));
 
-    client_base_conn->params = params;
-
-    return client_base_conn;
 }
+
+
 
 // make_client_conn(zxy_proxy_connection_t *proxy_conn, int client_sock_fd)
 // {

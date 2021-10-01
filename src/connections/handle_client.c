@@ -11,10 +11,10 @@
 #include <unistd.h>
 
 #include "defines.h"
-#include "connections.h"
-#include "netutils.h"
+#include "connections/connections.h"
+#include "utils/net/netutils.h"
 
-void handle_client_connection(int client_sock, char *backend_host, char *backend_port)
+void zxy_handle_client_connection(int client_sock, char *backend_host, char *backend_port)
 {
 
     struct addrinfo hints;
@@ -59,5 +59,7 @@ void handle_client_connection(int client_sock, char *backend_host, char *backend
 
     make_socket_nonblock(backend_socket_fd);
 
-    make_proxy_connection(client_sock, backend_socket_fd);
+    //now we have both client and backend sockets in non block mode
+
+    zxy_make_proxy_connection(client_sock, PLAIN_CONN, backend_socket_fd, PLAIN_CONN);
 }
