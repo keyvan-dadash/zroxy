@@ -12,10 +12,12 @@
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/backend_types.h"
 
-
-zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd);
-
 zxy_backend_base_t* zxy_make_backend_base_conn(void *params);
 
+
+//////// plain connections
+zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd);
+
+void zxy_set_up_backend_plain_conn_callbacks(zxy_backend_conn_t* backend_conn);
 
 #endif /* BACKEND_CONN_REQ_H */

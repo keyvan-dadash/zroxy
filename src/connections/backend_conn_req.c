@@ -15,6 +15,17 @@
 
 #include "utils/io/buffer_mamager.h"
 
+
+zxy_backend_base_t* zxy_make_backend_base_conn(void *params)
+{
+    zxy_backend_base_t *backend_base_conn = (zxy_backend_base_t*)calloc(1, sizeof(zxy_backend_base_t));
+
+    backend_base_conn->params = params;
+
+    return backend_base_conn;
+}
+
+
 zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd)
 {
     zxy_backend_conn_t *backend_conn = (zxy_backend_conn_t*)calloc(1, sizeof(zxy_backend_conn_t));
@@ -27,15 +38,10 @@ zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd)
     return backend_conn;
 }
 
-zxy_backend_base_t* zxy_make_backend_base_conn(void *params)
+void zxy_set_up_backend_plain_conn_callbacks(zxy_backend_conn_t* backend_conn)
 {
-    zxy_backend_base_t *backend_base_conn = (zxy_backend_base_t*)calloc(1, sizeof(zxy_backend_base_t));
 
-    backend_base_conn->params = params;
-
-    return backend_base_conn;
 }
-
 // handler_t* make_backend_handler(zxy_proxy_connection_t *proxy_handler, int backend_sock_fd)
 // {
 //     zxy_backend_base_t backend_conn_info;

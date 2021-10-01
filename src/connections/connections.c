@@ -70,13 +70,13 @@ zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy
     {
     case PLAIN_CONN: {
         zxy_backend_conn_t *backend_plain_conn = zxy_make_client_plain_conn(backend_fd);
+        zxy_set_up_backend_plain_conn_callbacks(backend_plain_conn);
         backend_base = zxy_make_backend_base_conn((void*)backend_plain_conn);
-        break;
         break;
     }
 
     case SSL_CONN: {
-        /* code */
+        //TODO: handle ssl
         break;
     }
 

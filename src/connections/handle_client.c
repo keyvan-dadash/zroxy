@@ -61,5 +61,5 @@ void zxy_handle_client_connection(int client_sock, char *backend_host, char *bac
 
     //now we have both client and backend sockets in non block mode
 
-    zxy_make_proxy_connection(client_sock, PLAIN_CONN, backend_socket_fd, PLAIN_CONN);
+    zxy_proxy_connection_t *proxy_obj = zxy_make_proxy_connection(client_sock, PLAIN_CONN, backend_socket_fd, PLAIN_CONN);
 }
