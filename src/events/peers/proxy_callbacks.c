@@ -5,10 +5,12 @@
 #include "defines.h"
 #include "events/io/epoll_manager.h"
 #include "events/peers/proxy_callbacks.h"
+#include "events/timers/timer_callback.h"
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/client_types.h"
 #include "connections/conntypes/backend_types.h"
 #include "utils/io/io_helper.h"
+#include "utils/timer/timers.h"
 
 
 
@@ -20,6 +22,11 @@ zxy_backend_base_t* get_backend_base_from(void *ptr)
 zxy_client_base_t* get_client_base_from(void *ptr)
 {
     return ((zxy_proxy_connection_t*)((zxy_event_handler_t*)ptr)->params)->client;
+}
+
+zxy_proxy_connection_t* get_proxy_conn_from(void *ptr)
+{
+    return ((zxy_proxy_connection_t*)((zxy_event_handler_t*)ptr)->params);
 }
 
 void zxy_handle_client_events(
@@ -81,11 +88,24 @@ void zxy_handle_backend_events(
     }
 }
 
+void zxy_handle_timer_up_events(
+    zxy_backend_base_t *backend_base, 
+    zxy_client_base_t *client_base
+)
+{
+    backend_base->force_close(backend_base->params);
+    client_base->force_close(client_base->params);
+}
+
 void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events)
 {
     zxy_event_handler_t *event_handler = (zxy_event_handler_t*)handler;
     zxy_backend_base_t *backend_base = get_backend_base_from(handler);
     zxy_client_base_t *client_base = get_client_base_from(handler);
+    zxy_proxy_connection_t *proxy_conn = get_proxy_conn_from(handler);
+
+    if (proxy_conn->timer_status_and_fd == TIMER_IS_UP)
+        return;
 
     switch (event_handler->sock_type)
     {
@@ -95,6 +115,7 @@ void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events)
             client_base,
             events
         );
+        proxy_conn->timer_status_and_fd = RELAX_TIMER;
         break;
     }
 
@@ -104,6 +125,24 @@ void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events)
             client_base,
             events
         );
+        proxy_conn->timer_status_and_fd = RELAX_TIMER;
+        break;
+    }
+
+    case PROXY_TIMER_SOCK: {
+        if (proxy_conn->timer_status_and_fd == RELAX_TIMER) {
+            proxy_conn->timer_status_and_fd = TIMER_RELAXED;
+            zxy_set_timer_time_with(sock_fd, 1, 0);
+        } else if ( (proxy_conn->timer_status_and_fd == TIMER_RELAXED) ||
+                (proxy_conn->timer_status_and_fd > 0) )
+        {
+            proxy_conn->timer_status_and_fd = TIMER_IS_UP;
+            zxy_handle_timer_up_events(
+                backend_base,
+                client_base
+            );
+            zxy_free_timer_handler(event_handler);
+        }
         break;
     }
     

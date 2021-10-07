@@ -14,6 +14,8 @@
 #include "connections/connections.h"
 #include "events/io/epoll_manager.h"
 #include "utils/net/netutils.h"
+#include "utils/timer/timers.h"
+#include "events/timers/timer_callback.h"
 
 void zxy_handle_client_connection(int client_sock, char *backend_host, char *backend_port)
 {
@@ -71,4 +73,9 @@ void zxy_handle_client_connection(int client_sock, char *backend_host, char *bac
     //create and register backend
     zxy_event_handler_t *backend_handler = make_proxy_event_handler(proxy_obj, backend_socket_fd, BACKEND_SOCK);
     zxy_add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
+
+    //create and register timer
+    int32_t tfd = zxy_create_timer_with_expiration(1, 0);
+    zxy_event_handler_t *timer_handler = make_proxy_event_handler(proxy_obj, tfd, PROXY_TIMER_SOCK);
+    zxy_add_handler_to_epoll(timer_handler, EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET);
 }
