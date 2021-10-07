@@ -42,6 +42,7 @@ zxy_client_conn_t* zxy_make_client_plain_conn(int sock_fd)
 
 void zxy_set_up_client_plain_base_callbacks(zxy_client_base_t* client_base)
 {
+    client_base->free_params = zxy_free_client_plain;
     client_base->force_close = zxy_client_plain_force_close;
     client_base->is_ready_event = zxy_client_plain_is_ready_for_event;
     client_base->on_close = zxy_on_client_plain_close_event;

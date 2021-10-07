@@ -39,12 +39,12 @@ int main(int argc, char *argv[])
 
     zxy_server_configs_t server_config = zxy_get_server_configs_from_file(argv[1]);
     zxy_proxy_configs_t proxy_config = zxy_get_proxy_configs_from_file(argv[1]);
-    zxy_certificates_configs_t cert_config = zxy_get_certificates_configs_from_file(argv[1]);
+    // zxy_certificates_configs_t cert_config = zxy_get_certificates_configs_from_file(argv[1]);
 
 
 
-    SSL_CTX *ctx = ssl_init();
-    ssl_load_certificates_and_private_keys(ctx, cert_config.certificate_path, cert_config.private_key_path);
+    // SSL_CTX *ctx = ssl_init();
+    // ssl_load_certificates_and_private_keys(ctx, cert_config.certificate_path, cert_config.private_key_path);
 
     memset(&hints, 0, sizeof(struct addrinfo));
 

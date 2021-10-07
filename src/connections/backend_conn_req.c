@@ -41,6 +41,7 @@ zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd)
 
 void zxy_set_up_backend_plain_base_callbacks(zxy_backend_base_t* backend_base)
 {
+    backend_base->free_params = zxy_free_backend_plain;
     backend_base->force_close = zxy_backend_plain_force_close;
     backend_base->is_ready_event = zxy_backend_plain_is_ready_for_event;
     backend_base->on_close = zxy_on_backend_plain_close_event;

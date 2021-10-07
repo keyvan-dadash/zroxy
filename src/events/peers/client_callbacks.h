@@ -19,4 +19,6 @@ int zxy_client_plain_force_close(void *ptr);
 
 int zxy_client_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr);
 
+void zxy_free_client_plain(void *ptr);
+
 #endif /* CLIENT_CALLBACKS_H */

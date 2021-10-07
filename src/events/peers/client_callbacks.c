@@ -204,6 +204,15 @@ int zxy_client_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, vo
     }
 }
 
+void zxy_free_client_plain(void *ptr)
+{
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
+
+    zxy_free_buffer_manager(client_conn->buffer_manager);
+    
+    free(client_conn);
+}
+
 
 // void zxy_client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
 // {

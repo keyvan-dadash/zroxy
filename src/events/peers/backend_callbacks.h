@@ -20,6 +20,8 @@ int zxy_backend_plain_force_close(void *ptr);
 
 int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr);
 
+void zxy_free_backend_plain(void *ptr);
+
 // void zxy_backend_on_event_callback(int client_sock_fd, uint32_t events, void *ptr);
 
 #endif /* BACKEND_CALLBACKS_H */

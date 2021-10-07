@@ -23,6 +23,8 @@ typedef void (*zxy_backend_event_callback)(int32_t, u_int32_t, void*);
 
 typedef int  (*zxy_backend_memebr_func)(u_int32_t, u_int32_t, void*);
 
+typedef void (*zxy_backend_free_params)(void*);
+
 /**
  * backend base connection which is all other type of backend connection should implement this
  */
@@ -41,6 +43,7 @@ typedef struct
     zxy_backend_request_buffer_reader request_buffer_reader;
     zxy_backend_close_callback_func force_close;
     zxy_backend_memebr_func is_ready_event;
+    zxy_backend_free_params free_params;
 
     /**
      * params which is passed to each of above functions and is custom impelementation of your connection

@@ -89,12 +89,16 @@ void zxy_handle_backend_events(
 }
 
 void zxy_handle_timer_up_events(
+    zxy_proxy_connection_t *proxy_conn,
     zxy_backend_base_t *backend_base, 
     zxy_client_base_t *client_base
 )
 {
     backend_base->force_close(backend_base->params);
     client_base->force_close(client_base->params);
+
+    zxy_add_block_to_link_list(proxy_conn->client_handler_ptr);
+    zxy_add_block_to_link_list(proxy_conn->backend_handler_ptr);
 }
 
 void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events)
@@ -138,6 +142,7 @@ void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events)
         {
             proxy_conn->timer_status_and_fd = TIMER_IS_UP;
             zxy_handle_timer_up_events(
+                proxy_conn,
                 backend_base,
                 client_base
             );
@@ -153,5 +158,8 @@ void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events)
 
 void zxy_free_proxy_obj(void* params)
 {
-    //TODO: handle some how free
+    zxy_event_handler_t *event_handler = (zxy_event_handler_t*)handler;
+    zxy_backend_base_t *backend_base = get_backend_base_from(handler);
+    zxy_client_base_t *client_base = get_client_base_from(handler);
+    zxy_proxy_connection_t *proxy_conn = get_proxy_conn_from(handler);
 }
