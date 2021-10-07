@@ -6,7 +6,7 @@
 
 #include <sys/types.h>
 
-#include "utils/io/buffer_mamager.h"
+#include "utils/io/buffer_manager.h"
 #include "utils/io/io_helper.h"
 
 typedef int (*zxy_client_read_callback_func)(void*);
@@ -19,7 +19,7 @@ typedef zxy_write_io_req_t (*zxy_client_request_buffer_reader)(void*);
 
 typedef void (*zxy_client_event_callback)(int32_t, u_int32_t, void*);
 
-typedef int  (*zxy_client_memebr_func)(u_int32_t, void*);
+typedef int  (*zxy_client_memebr_func)(u_int32_t, u_int32_t, void*);
 
 /**
  * client base connection which is all other type of client connection should implement this

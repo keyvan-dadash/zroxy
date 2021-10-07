@@ -7,15 +7,16 @@
 #include <sys/types.h>
 #include <sys/epoll.h>
 
-#include "epoll_manager.h"
+#include "events/io/epoll_manager.h"
+#include "connections/conntypes/proxy_types.h"
 
 
-handler_t* make_timer_handler(int32_t tfd, proxy_handler_t *proxy_handler);
+zxy_event_handler_t* zxy_make_timer_handler(int32_t tfd, zxy_proxy_connection_t *proxy_handler);
 
-void on_timer_event_callback(int32_t fd, uint32_t event, void *ptr);
+void zxy_on_timer_event_callback(int32_t fd, uint32_t event, void *ptr);
 
 
-void free_timer_params(void *ptr);
+void zxy_free_timer_params(void *ptr);
 
 
 

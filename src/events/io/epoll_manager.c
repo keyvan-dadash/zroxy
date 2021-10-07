@@ -11,9 +11,9 @@
 #include <sys/epoll.h>
 #include <errno.h>
 
-#include "logs.h"
-#include "epoll_manager.h"
 #include "defines.h"
+#include "logging/logs.h"
+#include "events/io/epoll_manager.h"
 
 
 int epoll_fd = -1;

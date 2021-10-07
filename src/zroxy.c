@@ -12,11 +12,10 @@
 #include <openssl/ssl.h>
 
 #include "defines.h"
-#include "handle_client.h"
-#include "netutils.h"
-#include "server.h"
+#include "utils/net/netutils.h"
+#include "server/server.h"
 #include "conf/configure.h"
-#include "ssl_helper.h"
+#include "utils/ssl/ssl_helper.h"
 
 
 int main(int argc, char *argv[])
@@ -38,9 +37,14 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    connection_configs_t config = get_configs_from_file(argv[1]);
+    zxy_server_configs_t server_config = zxy_get_server_configs_from_file(argv[1]);
+    zxy_proxy_configs_t proxy_config = zxy_get_proxy_configs_from_file(argv[1]);
+    zxy_certificates_configs_t cert_config = zxy_get_certificates_configs_from_file(argv[1]);
+
+
+
     SSL_CTX *ctx = ssl_init();
-    ssl_load_certificates_and_private_keys(ctx, config.certificate_path, config.private_key_path);
+    ssl_load_certificates_and_private_keys(ctx, cert_config.certificate_path, cert_config.private_key_path);
 
     memset(&hints, 0, sizeof(struct addrinfo));
 
@@ -48,7 +52,7 @@ int main(int argc, char *argv[])
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    getaddrinfo_error = getaddrinfo(NULL, config.server_port_char, &hints, &addrs);
+    getaddrinfo_error = getaddrinfo(NULL, server_config.server_port, &hints, &addrs);
 
     if (getaddrinfo_error != 0) {
         fprintf(stderr, "cannot find backend: %s\n", gai_strerror(getaddrinfo_error));
@@ -85,17 +89,17 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    fprintf(stdout, "Listen on port: %s\n", config.server_port_char);
+    fprintf(stdout, "Listen on port: %s\n", server_config.server_port);
 
 
-    epoll_init();
+    zxy_epoll_init();
 
-    backend_addrs_t backend_addrs;
+    zxy_backend_addrs_t backend_addrs;
 
-    backend_addrs.backend_host = config.backend_address;
-    backend_addrs.backend_port = config.backend_port_char;
+    backend_addrs.backend_host = proxy_config.proxy_address;
+    backend_addrs.backend_port = proxy_config.proxy_port;
 
-    make_socket_nonblock(server_sock);
+    zxy_make_socket_nonblock(server_sock);
 
-    start_server(server_sock, &backend_addrs);
+    zxy_start_server(server_sock, &backend_addrs);
 }

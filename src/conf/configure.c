@@ -9,8 +9,8 @@
 #include <luajit-2.1/lualib.h>
 #include <luajit-2.1/lauxlib.h>
 
-#include "configure.h"
-#include "logs.h"
+#include "conf/configure.h"
+#include "logging/logs.h"
 
 zxy_server_configs_t zxy_get_server_configs_from_file(char *filename)
 {
@@ -38,7 +38,7 @@ zxy_proxy_configs_t zxy_get_proxy_configs_from_file(char *filename)
 
     zxy_proxy_configs_t proxy_configs;
 
-    char *server_address = strdup("server_address");
+    char *server_address = strdup("server_address");    
     char *server_port = strdup("server_port");
 
     proxy_configs.proxy_address = get_string_option(L, server_address);

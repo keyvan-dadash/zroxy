@@ -8,12 +8,12 @@
 
 
 
-#include "netutils.h"
-#include "logs.h"
+#include "utils/net/netutils.h"
+#include "logging/logs.h"
 
 
 
-void make_socket_nonblock(int sock_fd)
+void zxy_make_socket_nonblock(int sock_fd)
 {
     int flags;
     flags = fcntl(sock_fd, F_GETFL, 0);

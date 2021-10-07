@@ -6,12 +6,12 @@
 
 #include <sys/types.h>
 
-#include "utils/io/buffer_mamager.h"
+#include "utils/io/buffer_manager.h"
 #include "utils/io/io_helper.h"
 
 
 
-typedef void (*zxy_backend_read_callback_func)(void*);
+typedef int (*zxy_backend_read_callback_func)(void*);
 
 typedef int (*zxy_backend_write_callback_func)(void*, zxy_write_io_req_t*);
 
@@ -21,7 +21,7 @@ typedef zxy_write_io_req_t (*zxy_backend_request_buffer_reader)(void*);
 
 typedef void (*zxy_backend_event_callback)(int32_t, u_int32_t, void*);
 
-typedef int  (*zxy_backend_memebr_func)(u_int32_t, void*);
+typedef int  (*zxy_backend_memebr_func)(u_int32_t, u_int32_t, void*);
 
 /**
  * backend base connection which is all other type of backend connection should implement this

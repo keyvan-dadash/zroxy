@@ -7,12 +7,13 @@
 #include <sys/types.h>
 #include <sys/timerfd.h>
 #include <errno.h>
+#include <time.h>
 
 
-#include "timers.h"
-#include "logs.h"
+#include "utils/timer/timers.h"
+#include "logging/logs.h"
 
-int32_t create_timer_with_expiration(int32_t seconds, int32_t nanoseconds)
+int32_t zxy_create_timer_with_expiration(int32_t seconds, int32_t nanoseconds)
 {
     int tfd = timerfd_create(CLOCK_MONOTONIC, 0);
     if (tfd == -1) {
@@ -33,7 +34,7 @@ int32_t create_timer_with_expiration(int32_t seconds, int32_t nanoseconds)
     return tfd;
 }
 
-int32_t create_timer_with_interval(int32_t seconds, int32_t nanoseconds)
+int32_t zxy_create_timer_with_interval(int32_t seconds, int32_t nanoseconds)
 {
     int tfd = timerfd_create(CLOCK_MONOTONIC, 0);
     
@@ -52,7 +53,7 @@ int32_t create_timer_with_interval(int32_t seconds, int32_t nanoseconds)
     return tfd;
 }
 
-void set_timer_time_with(int32_t timerfd, int32_t seconds, int32_t nanoseconds)
+void zxy_set_timer_time_with(int32_t timerfd, int32_t seconds, int32_t nanoseconds)
 {
     struct itimerspec ts;
 

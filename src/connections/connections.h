@@ -3,11 +3,13 @@
 #ifndef CONNECTIONS_H
 #define CONNECTIONS_H
 
-
+#include "events/io/epoll_manager.h"
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/client_types.h"
 #include "connections/conntypes/backend_types.h"
 #include "connections/conntypes/proxy_types.h"
+
+zxy_event_handler_t *make_proxy_event_handler(zxy_proxy_connection_t*, int);
 
 zxy_proxy_connection_t* zxy_make_proxy_connection(int32_t client_fd,
             enum zxy_client_conn_type* client_base, 

@@ -9,8 +9,8 @@
 #include <openssl/err.h>
 
 #include "defines.h"
-#include "ssl_helper.h"
-#include "logs.h"
+#include "utils/ssl/ssl_helper.h"
+#include "logging/logs.h"
 
 
 SSL_CTX* ssl_init()

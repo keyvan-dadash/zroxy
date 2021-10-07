@@ -11,7 +11,7 @@
 
 typedef struct
 {
-    char *server_port_char;
+    char *server_port;
 } zxy_server_configs_t;
 
 

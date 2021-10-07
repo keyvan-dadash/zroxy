@@ -12,8 +12,9 @@
 #include "connections/backend_conn_req.h"
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/backend_types.h"
+#include "events/peers/backend_callbacks.h"
 
-#include "utils/io/buffer_mamager.h"
+#include "utils/io/buffer_manager.h"
 
 
 zxy_backend_base_t* zxy_make_backend_base_conn(void *params)
@@ -38,9 +39,14 @@ zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd)
     return backend_conn;
 }
 
-void zxy_set_up_backend_plain_conn_callbacks(zxy_backend_conn_t* backend_conn)
+void zxy_set_up_backend_plain_base_callbacks(zxy_backend_base_t* backend_base)
 {
-
+    backend_base->force_close = zxy_backend_plain_force_close;
+    backend_base->is_ready_event = zxy_backend_plain_is_ready_for_event;
+    backend_base->on_close = zxy_on_backend_plain_close_event;
+    backend_base->on_read = zxy_on_backend_plain_read_event;
+    backend_base->on_write = zxy_on_backend_plain_write_event;
+    backend_base->request_buffer_reader = zxy_backend_plain_request_buffer_reader;
 }
 // handler_t* make_backend_handler(zxy_proxy_connection_t *proxy_handler, int backend_sock_fd)
 // {

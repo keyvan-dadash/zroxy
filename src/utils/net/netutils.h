@@ -5,7 +5,7 @@
 
 
 
-void make_socket_nonblock(int sock_fd);
+void zxy_make_socket_nonblock(int sock_fd);
 
 
 

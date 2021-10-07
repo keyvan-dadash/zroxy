@@ -12,12 +12,12 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#include "server.h"
-#include "logs.h"
-#include "handle_client.h"
-#include "netutils.h"
+#include "server/server.h"
+#include "logging/logs.h"
+#include "connections/handle_client.h"
+#include "utils/net/netutils.h"
 
-void accept_new_conn(int listen_fd, backend_addrs_t *addrs)
+void zxy_accept_new_conn(int listen_fd, zxy_backend_addrs_t *addrs)
 {
     int new_client_sock_fd;
 
@@ -34,12 +34,12 @@ void accept_new_conn(int listen_fd, backend_addrs_t *addrs)
         LOG_INFO("accept new connection with fd(%d)\n", new_client_sock_fd);
 
         
-        make_socket_nonblock(new_client_sock_fd);
+        zxy_make_socket_nonblock(new_client_sock_fd);
         handle_client_connection(new_client_sock_fd, addrs->backend_host, addrs->backend_port);
     }
 }
 
-void free_listen_fd_requirments(void *ptr)
+void zxy_free_listen_fd_requirments(void *ptr)
 {
     // backend_addrs_t *addrs = (backend_addrs_t*)ptr;
 
@@ -47,20 +47,20 @@ void free_listen_fd_requirments(void *ptr)
     // free(addrs->backend_port);
 }
 
-void handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
+void zxy_handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
 {
-    backend_addrs_t *addrs = (backend_addrs_t*)ptr;
+    zxy_backend_addrs_t *addrs = (zxy_backend_addrs_t*)ptr;
 
     if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
         // LOG_WARNING("Listen fd is going to close and remove from epoll");
-        remove_fd_from_epoll(listen_fd);
+        zxy_remove_fd_from_epoll(listen_fd);
         close(listen_fd);
-        free_listen_fd_requirments(ptr);
+        zxy_free_listen_fd_requirments(ptr);
         return;
     }
 
     if (events & EPOLLIN) { //READ ready
-        accept_new_conn(listen_fd, addrs);
+        zxy_accept_new_conn(listen_fd, addrs);
     }
 
     if (events & EPOLLOUT) { //Write ready
@@ -69,15 +69,15 @@ void handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
 }
 
 
-void start_server(int listen_fd, backend_addrs_t *addrs)
+void zxy_start_server(int listen_fd, zxy_backend_addrs_t *addrs)
 {
-    handler_t *listen_fd_handler = (handler_t *)malloc(sizeof(handler_t));
-    listen_fd_handler->callback = handle_accepting_connections;
+    zxy_event_handler_t *listen_fd_handler = (zxy_event_handler_t *)malloc(sizeof(zxy_event_handler_t));
+    listen_fd_handler->callback = zxy_handle_accepting_connections;
     listen_fd_handler->params = addrs;
     listen_fd_handler->sock_fd = listen_fd;
-    listen_fd_handler->free_params = free_listen_fd_requirments;
+    listen_fd_handler->free_params = zxy_free_listen_fd_requirments;
 
-    add_handler_to_epoll(listen_fd_handler, EPOLLIN | EPOLLERR | EPOLLHUP);
+    zxy_add_handler_to_epoll(listen_fd_handler, EPOLLIN | EPOLLERR | EPOLLHUP);
 
-    event_loop();
+    zxy_event_loop();
 }

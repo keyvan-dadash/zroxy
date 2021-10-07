@@ -17,7 +17,7 @@
 #include "events/peers/client_callbacks.h"
 #include "logging/logs.h"
 #include "utils/io/io_helper.h"
-#include "utils/io/buffer_mamager.h"
+#include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
 
 zxy_client_conn_t* get_client_conn_from(void *ptr)
@@ -173,11 +173,15 @@ int zxy_client_plain_force_close(void *ptr)
     return 1;
 }
 
-int zxy_client_plain_is_ready_for_event(u_int32_t event, void* ptr)
+int zxy_client_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr)
 {
     zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
 
-    switch (event)
+    if (events != -1) {
+        client_conn->events = events;
+    }
+
+    switch (is_ready)
     {
     case READ_EVENT: {
         if (client_conn->events & EPOLLIN) return 1;

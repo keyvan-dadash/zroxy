@@ -11,11 +11,11 @@
 #include <netdb.h>
 
 
-#include "timers.h"
-#include "timer_callback.h"
-#include "epoll_manager.h"
-#include "client_callbacks.h"
-#include "backend_callbacks.h"
+// #include "timers.h"
+// #include "timer_callback.h"
+// #include "epoll_manager.h"
+// #include "client_callbacks.h"
+// #include "backend_callbacks.h"
 
 #include "logging/logs.h"
 #include "connections/connections.h"
@@ -24,7 +24,14 @@
 #include "connections/conntypes/proxy_types.h"
 
 
+zxy_event_handler_t* make_proxy_event_handler(zxy_proxy_connection_t* proxy_obj, int sock)
+{
+    zxy_event_handler_t* event_handler = (zxy_event_handler_t*)malloc(sizeof(zxy_event_handler_t));
 
+    event_handler->sock_fd = sock;
+    event_handler->params = (void*)proxy_obj;
+    //TODO: params free and proxy callback
+}
 
 zxy_proxy_connection_t* zxy_make_proxy_connection(
             int32_t client_fd,
@@ -47,8 +54,8 @@ zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_cl
     {
     case PLAIN_CONN: {
         zxy_client_conn_t *client_plain_conn = zxy_make_client_plain_conn(client_fd);
-        zxy_set_up_client_plain_conn_callbacks(client_plain_conn);
         client_base = zxy_make_client_base_conn((void*)client_plain_conn);
+        zxy_set_up_client_plain_base_callbacks(client_base);
         break;
     }
 
@@ -70,8 +77,8 @@ zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy
     {
     case PLAIN_CONN: {
         zxy_backend_conn_t *backend_plain_conn = zxy_make_client_plain_conn(backend_fd);
-        zxy_set_up_backend_plain_conn_callbacks(backend_plain_conn);
         backend_base = zxy_make_backend_base_conn((void*)backend_plain_conn);
+        zxy_set_up_backend_plain_base_callbacks(backend_base);
         break;
     }
 
@@ -204,7 +211,7 @@ zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy
 //     handler_t *backend_handler = make_backend_handler(proxy_obj, backend_sock_fd);
 
 //     int32_t tfd = create_timer_with_expiration(1, 0);
-//     handler_t *timer_handler = make_timer_handler(tfd, proxy_obj);
+//     handler_t *timer_handler = zxy_make_timer_handler(tfd, proxy_obj);
 
 //     proxy_obj->client_handler_ptr = client_handler;
 //     proxy_obj->backend_handler_ptr = backend_handler;

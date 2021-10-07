@@ -16,6 +16,7 @@ typedef void (*zxy_handler_free_params_func) (void*);
 typedef struct 
 {
     int sock_fd;
+    int8_t sock_type;
     zxy_event_loop_handler_func callback;
     void *params;
     zxy_handler_free_params_func free_params;

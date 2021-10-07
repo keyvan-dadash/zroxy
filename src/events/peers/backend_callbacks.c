@@ -15,7 +15,7 @@
 #include "events/peers/backend_callbacks.h"
 #include "logging/logs.h"
 #include "utils/io/io_helper.h"
-#include "utils/io/buffer_mamager.h"
+#include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
 
 
@@ -154,11 +154,15 @@ int zxy_backend_plain_force_close(void *ptr)
     return 1;
 }
 
-int zxy_backend_plain_is_ready_for_event(u_int32_t event, void* ptr)
+int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr)
 {
     zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
 
-    switch (event)
+    if (events != -1) {
+        backend_conn->events = events;
+    }
+
+    switch (is_ready)
     {
     case READ_EVENT: {
         if (backend_conn->events & EPOLLIN) return 1;
