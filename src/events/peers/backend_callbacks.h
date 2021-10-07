@@ -5,15 +5,21 @@
 #define BACKEND_CALLBACKS_H
 
 
-#include "epoll_manager.h"
+#include "events/io/epoll_manager.h"
+#include "utils/io/io_helper.h"
 
+int zxy_on_backend_plain_read_event(void *ptr);
 
-void on_backend_read_event(void *ptr);
+int zxy_on_backend_plain_write_event(void *ptr, zxy_write_io_req_t* write_req);
 
-void on_backend_write_event(void *ptr);
+int zxy_on_backend_plain_close_event(void *ptr);
 
-void on_backend_close_event(void *ptr);
+zxy_write_io_req_t zxy_backend_plain_request_buffer_reader(void *ptr);
 
-void backend_on_event_callback(int client_sock_fd, uint32_t events, void *ptr);
+int zxy_backend_plain_force_close(void *ptr);
+
+int zxy_backend_plain_is_ready_for_event(u_int32_t events, void* ptr);
+
+// void zxy_backend_on_event_callback(int client_sock_fd, uint32_t events, void *ptr);
 
 #endif /* BACKEND_CALLBACKS_H */

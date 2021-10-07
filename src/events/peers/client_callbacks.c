@@ -20,11 +20,19 @@
 #include "utils/io/buffer_mamager.h"
 #include "utils/timer/timers.h"
 
+zxy_client_conn_t* get_client_conn_from(void *ptr)
+{
+    return (zxy_client_conn_t*)ptr;
+}
+
+zxy_client_base_t* get_client_base_from(void *ptr)
+{
+    return (zxy_client_base_t*)ptr;
+}
 
 int zxy_on_client_plain_read_event(void *ptr)
 {
-    zxy_client_base_t *client_base = (zxy_client_base_t*)ptr;
-    zxy_client_conn_t *client_conn = (zxy_client_conn_t*)(client_base->params);
+    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
 
     int nbytes;
 
@@ -52,6 +60,8 @@ int zxy_on_client_plain_read_event(void *ptr)
     }
 
     zxy_nbyte_written_to_buffer(client_conn->buffer_manager, nbytes);
+
+    return nbytes;
 
 
 
@@ -96,68 +106,120 @@ int zxy_on_client_plain_read_event(void *ptr)
     // }
 }
 
-int zxy_on_client_plain_write_event(void *ptr)
+int zxy_on_client_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
 {
-    zxy_client_base_t *client_base = (zxy_client_base_t*)ptr;
-    zxy_client_conn_t *client_conn = (zxy_client_conn_t*)(client_base->params);
+    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
 
     int nbytes;
-    zxy_write_io_req_t write_req;
         
-    write_req.req_fd = client_conn->sock_fd;
-    write_req.buffer = client_conn->buffer_manager->buffer;
-    write_req.send_nbytes = backend_info->buffer_ptr;
-    write_req.clear_nbytes = backend_info->max_bufer_size;
-    write_req.flags = 0;
+    write_req->req_fd = client_conn->sock_fd;
 
     nbytes = write_socket_non_block_and_clear_buf(&write_req);
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
-        on_client_close_event(ptr);
+        return 0;
     } else if (nbytes == WOULD_BLOCK) {
-        return;
+        return WOULD_BLOCK;
     } else if (nbytes == UNKOWN_ERROR) {
         LOG_ERROR("fuck in send\n");
+        return UNKOWN_ERROR;
     }
 
     LOG_INFO("number of written bytes is %d(in send client)\n", nbytes);
-    backend_info->buffer_ptr = 0;
+    
+    return nbytes;
 }
 
 int zxy_on_client_plain_close_event(void *ptr)
 {
-    client_connection_info_t *client_info = &( ((proxy_handler_t*)ptr)->client_info);
+    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
 
-    remove_fd_from_epoll(client_info->client_sock_fd);
-    LOG_INFO("Client fd(%d) closed the connection\n", client_info->client_sock_fd);
-    client_info->is_client_closed = 1;
-    close(client_info->client_sock_fd);
+    remove_fd_from_epoll(client_conn->sock_fd);
+    LOG_INFO("client fd(%d) closed the connection\n", client_conn->sock_fd);
+    client_conn->is_closed = 1;
+    close(client_conn->sock_fd);
 
-    add_block_to_link_list(((proxy_handler_t*)ptr)->client_handler_ptr);
+    return 1;
+
+    // add_block_to_link_list(((proxy_handler_t*)ptr)->client_handler_ptr);
 }
 
 
-
-void zxy_client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
+zxy_write_io_req_t zxy_client_plain_request_buffer_reader(void *ptr)
 {
-    proxy_handler_t *proxy_obj = (proxy_handler_t*)ptr;
-    proxy_obj->client_info.client_events = events;
+    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
 
-    if (proxy_obj->client_info.is_client_closed || proxy_obj->timer_status_and_fd == TIMER_IS_UP)
-        return;
+    zxy_write_io_req_t write_req;
+    write_req.buffer = client_conn->buffer_manager->buffer;
+    write_req.flags = 0;
+    write_req.send_nbytes = client_conn->buffer_manager->current_buffer_ptr;
+    write_req.clear_nbytes = client_conn->buffer_manager->current_buffer_ptr;
+    
+    return write_req;
+}
 
 
-    if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
-        proxy_obj->client_info.client_handlers->on_close(ptr);
-        return;
+//TODO: change logic of force close
+int zxy_client_plain_force_close(void *ptr)
+{
+    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+
+    remove_fd_from_epoll(client_conn->sock_fd);
+    LOG_INFO("backend fd(%d) closed the connection\n", client_conn->sock_fd);
+    client_conn->is_closed = 1;
+    close(client_conn->sock_fd);
+
+    return 1;
+}
+
+int zxy_client_plain_is_ready_for_event(u_int32_t event, void* ptr)
+{
+    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+
+    switch (event)
+    {
+    case READ_EVENT: {
+        if (client_conn->events & EPOLLIN) return 1;
+        return 0;
+        break;
     }
-
-    if (is_readable_event(events)) { //Read ready
-        proxy_obj->client_info.client_handlers->on_read(ptr);
+    case WRITE_EVENT: {
+        if (client_conn->events & EPOLLOUT) return 1;
+        return 0;
+        break;
     }
-
-    if (is_writable_event(events)) { //Write ready
-        proxy_obj->client_info.client_handlers->on_write(ptr);
+    case CLOSE_EVENT: {
+        if ((client_conn->events & EPOLLHUP) | (client_conn->events & EPOLLERR)) return 1;
+        return 0;
+        break;
+    }
+    
+    default:
+        return 0;
     }
 }
+
+
+// void zxy_client_on_event_callback(int client_sock_fd, uint32_t events, void *ptr)
+// {
+//     proxy_handler_t *proxy_obj = (proxy_handler_t*)ptr;
+//     proxy_obj->client_info.client_events = events;
+
+//     if (proxy_obj->client_info.is_client_closed || proxy_obj->timer_status_and_fd == TIMER_IS_UP)
+//         return;
+
+
+//     if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
+//         proxy_obj->client_info.client_handlers->on_close(ptr);
+//         return;
+//     }
+
+//     if (is_readable_event(events)) { //Read ready
+//         proxy_obj->client_info.client_handlers->on_read(ptr);
+//     }
+
+//     if (is_writable_event(events)) { //Write ready
+//         proxy_obj->client_info.client_handlers->on_write(ptr);
+//     }
+// }

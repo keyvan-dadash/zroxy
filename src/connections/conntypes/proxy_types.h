@@ -9,8 +9,6 @@
 #include "connections/conntypes/client_types.h"
 #include "connections/conntypes/backend_types.h"
 
-
-
 typedef void (*proxy_callback_func)(void*);
 
 typedef struct
