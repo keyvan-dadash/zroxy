@@ -33,13 +33,7 @@ typedef struct
 
 
 
-enum zxy_client_conn_type
-{
-    PLAIN_CONN,
-    SSL_CONN
-};
-
-enum zxy_backend_conn_type
+enum zxy_conn_type
 {
     PLAIN_CONN,
     SSL_CONN

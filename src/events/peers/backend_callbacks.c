@@ -19,12 +19,12 @@
 #include "utils/timer/timers.h"
 
 
-zxy_backend_conn_t* get_backend_conn_from(void *ptr)
+zxy_backend_conn_t* convert_backend_conn(void *ptr)
 {
     return (zxy_backend_conn_t*)ptr;
 }
 
-zxy_backend_base_t* get_backend_base_from(void *ptr)
+zxy_backend_base_t* convert_backend_base(void *ptr)
 {
     return (zxy_backend_base_t*)ptr;
 }
@@ -32,7 +32,7 @@ zxy_backend_base_t* get_backend_base_from(void *ptr)
 
 int zxy_on_backend_plain_read_event(void *ptr)
 {
-    zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
+    zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     int nbytes;
 
@@ -63,6 +63,8 @@ int zxy_on_backend_plain_read_event(void *ptr)
 
     zxy_nbyte_written_to_buffer(backend_conn->buffer_manager, nbytes);
 
+    return nbytes;
+
 
     // LOG_INFO("number of readed bytes is %d(back)\n", nbytes);
 
@@ -89,13 +91,13 @@ int zxy_on_backend_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
 
     // backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);
 
-    zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
+    zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     int nbytes;
         
     write_req->req_fd = backend_conn->sock_fd;
 
-    nbytes = write_socket_non_block_and_clear_buf(&write_req);
+    nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
@@ -114,9 +116,9 @@ int zxy_on_backend_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
 
 int zxy_on_backend_plain_close_event(void *ptr)
 {
-    zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
+    zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
-    remove_fd_from_epoll(backend_conn->sock_fd);
+    zxy_remove_fd_from_epoll(backend_conn->sock_fd);
     LOG_INFO("backend fd(%d) closed the connection\n", backend_conn->sock_fd);
     backend_conn->is_closed = 1;
     close(backend_conn->sock_fd);
@@ -129,7 +131,7 @@ int zxy_on_backend_plain_close_event(void *ptr)
 
 zxy_write_io_req_t zxy_backend_plain_request_buffer_reader(void *ptr)
 {
-    zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
+    zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     zxy_write_io_req_t write_req;
     write_req.buffer = backend_conn->buffer_manager->buffer;
@@ -144,9 +146,9 @@ zxy_write_io_req_t zxy_backend_plain_request_buffer_reader(void *ptr)
 //TODO: change logic of force close
 int zxy_backend_plain_force_close(void *ptr)
 {
-    zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
+    zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
-    remove_fd_from_epoll(backend_conn->sock_fd);
+    zxy_remove_fd_from_epoll(backend_conn->sock_fd);
     LOG_INFO("backend fd(%d) closed the connection\n", backend_conn->sock_fd);
     backend_conn->is_closed = 1;
     close(backend_conn->sock_fd);
@@ -156,7 +158,7 @@ int zxy_backend_plain_force_close(void *ptr)
 
 int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr)
 {
-    zxy_backend_conn_t *backend_conn = get_backend_conn_from(ptr);
+    zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     if (events != -1) {
         backend_conn->events = events;
@@ -189,7 +191,7 @@ int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, v
 
 // void zxy_backend_on_event_callback(int backend_sock_fd, uint32_t events, void *ptr)
 // {
-//     zxy_backend_base_t *backend_base = get_backend_base_from(ptr);
+//     zxy_backend_base_t *backend_base = convert_backend_base(ptr);
 
 
 

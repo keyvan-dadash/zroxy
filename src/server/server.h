@@ -16,7 +16,7 @@ typedef struct
 
 void zxy_accept_new_conn(int listen_fd, zxy_backend_addrs_t *addrs);
 
-void zxy_handle_accepting_connections(int listen_fd, uint32_t events, void *ptr);
+void zxy_handle_accepting_connections(void *ptr, int listen_fd, uint32_t events);
 
 void zxy_start_server(int listen_fd, zxy_backend_addrs_t *addrs);
 

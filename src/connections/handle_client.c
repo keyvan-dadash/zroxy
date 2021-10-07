@@ -12,6 +12,7 @@
 
 #include "defines.h"
 #include "connections/connections.h"
+#include "events/io/epoll_manager.h"
 #include "utils/net/netutils.h"
 
 void zxy_handle_client_connection(int client_sock, char *backend_host, char *backend_port)
@@ -63,5 +64,11 @@ void zxy_handle_client_connection(int client_sock, char *backend_host, char *bac
 
     zxy_proxy_connection_t *proxy_obj = zxy_make_proxy_connection(client_sock, PLAIN_CONN, backend_socket_fd, PLAIN_CONN);
 
+    //create and register client
+    zxy_event_handler_t *client_handler = make_proxy_event_handler(proxy_obj, client_sock, CLIENT_SOCK);
+    zxy_add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
 
+    //create and register backend
+    zxy_event_handler_t *backend_handler = make_proxy_event_handler(proxy_obj, backend_socket_fd, BACKEND_SOCK);
+    zxy_add_handler_to_epoll(backend_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR | EPOLLET);
 }

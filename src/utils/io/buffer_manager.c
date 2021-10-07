@@ -27,6 +27,8 @@ int zxy_double_buffer_size(zxy_buffer_manager_t* buffer_manager)
     buffer_manager->buffer = (char *)realloc(buffer_manager->buffer, ((buffer_manager->max_size_of_buffer - 1) * 2 + 1) );
     memset((buffer_manager->buffer + buffer_manager->max_size_of_buffer), '\0', (buffer_manager->max_size_of_buffer - 1));
     buffer_manager->max_size_of_buffer = ((buffer_manager->max_size_of_buffer - 1) * 2 + 1);
+
+    return buffer_manager->max_size_of_buffer;
 }
 
 int zxy_should_resize_buffer(zxy_buffer_manager_t* buffer_manager)

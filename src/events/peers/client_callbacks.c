@@ -20,19 +20,19 @@
 #include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
 
-zxy_client_conn_t* get_client_conn_from(void *ptr)
+zxy_client_conn_t* convert_client_conn(void *ptr)
 {
     return (zxy_client_conn_t*)ptr;
 }
 
-zxy_client_base_t* get_client_base_from(void *ptr)
+zxy_client_base_t* convert_client_base(void *ptr)
 {
     return (zxy_client_base_t*)ptr;
 }
 
 int zxy_on_client_plain_read_event(void *ptr)
 {
-    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
     int nbytes;
 
@@ -108,13 +108,13 @@ int zxy_on_client_plain_read_event(void *ptr)
 
 int zxy_on_client_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
 {
-    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
     int nbytes;
         
     write_req->req_fd = client_conn->sock_fd;
 
-    nbytes = write_socket_non_block_and_clear_buf(&write_req);
+    nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
@@ -133,9 +133,9 @@ int zxy_on_client_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
 
 int zxy_on_client_plain_close_event(void *ptr)
 {
-    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
-    remove_fd_from_epoll(client_conn->sock_fd);
+    zxy_remove_fd_from_epoll(client_conn->sock_fd);
     LOG_INFO("client fd(%d) closed the connection\n", client_conn->sock_fd);
     client_conn->is_closed = 1;
     close(client_conn->sock_fd);
@@ -148,7 +148,7 @@ int zxy_on_client_plain_close_event(void *ptr)
 
 zxy_write_io_req_t zxy_client_plain_request_buffer_reader(void *ptr)
 {
-    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
     zxy_write_io_req_t write_req;
     write_req.buffer = client_conn->buffer_manager->buffer;
@@ -163,9 +163,9 @@ zxy_write_io_req_t zxy_client_plain_request_buffer_reader(void *ptr)
 //TODO: change logic of force close
 int zxy_client_plain_force_close(void *ptr)
 {
-    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
-    remove_fd_from_epoll(client_conn->sock_fd);
+    zxy_remove_fd_from_epoll(client_conn->sock_fd);
     LOG_INFO("backend fd(%d) closed the connection\n", client_conn->sock_fd);
     client_conn->is_closed = 1;
     close(client_conn->sock_fd);
@@ -175,7 +175,7 @@ int zxy_client_plain_force_close(void *ptr)
 
 int zxy_client_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr)
 {
-    zxy_client_conn_t *client_conn = get_client_conn_from(ptr);
+    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
     if (events != -1) {
         client_conn->events = events;

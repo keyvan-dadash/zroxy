@@ -18,8 +18,8 @@
 #define CLOSE_EVENT 43989761
 
 
-#define CLIENT_SOCK 130
-#define BACKEND_SOCK 131
-#define PROXY_TIMER_SOCK 132
+#define CLIENT_SOCK 101
+#define BACKEND_SOCK 102
+#define PROXY_TIMER_SOCK 103
 
 #endif /* DEFINES_H */

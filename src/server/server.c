@@ -35,7 +35,7 @@ void zxy_accept_new_conn(int listen_fd, zxy_backend_addrs_t *addrs)
 
         
         zxy_make_socket_nonblock(new_client_sock_fd);
-        handle_client_connection(new_client_sock_fd, addrs->backend_host, addrs->backend_port);
+        zxy_handle_client_connection(new_client_sock_fd, addrs->backend_host, addrs->backend_port);
     }
 }
 
@@ -47,9 +47,10 @@ void zxy_free_listen_fd_requirments(void *ptr)
     // free(addrs->backend_port);
 }
 
-void zxy_handle_accepting_connections(int listen_fd, uint32_t events, void *ptr)
+void zxy_handle_accepting_connections(void *ptr, int listen_fd, uint32_t events)
 {
-    zxy_backend_addrs_t *addrs = (zxy_backend_addrs_t*)ptr;
+    zxy_event_handler_t *event_handler = (zxy_event_handler_t*)ptr;
+    zxy_backend_addrs_t *addrs = (zxy_backend_addrs_t*)(event_handler->params);
 
     if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
         // LOG_WARNING("Listen fd is going to close and remove from epoll");

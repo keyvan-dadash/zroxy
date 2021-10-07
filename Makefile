@@ -5,12 +5,13 @@ clean:
 
 CC = gcc
 CFLAGS = -g -Wall -Werror
-INCLUDE_DIRS := -I/usr/local/include/luajit-2.1/ -I/usr/local/include
+INCLUDE_DIRS := -I/usr/local/include/luajit-2.1/ -I/usr/local/include -I./src
 LDFLAGS := -L/usr/local/lib 
 LIBS := -lluajit-5.1 -llua -ldl -lm  -lssl -lcrypto
 
 src_root := src
-src_subdirs := 
+src_subdirs += $(shell find src/ -mindepth 1 -type d -printf '%P\n')
+$(info src_subdirs=$(src_subdirs))
 build_root := build
 
 o_suffix := .o
@@ -19,6 +20,7 @@ o_suffix := .o
 # and fetch all existing files with suffixes matching the list.
 source_suffixes := .c .cpp .cxx
 sources := $(foreach d,$(addprefix $(src_root)/,$(src_subdirs)),$(wildcard $(addprefix $d/*,$(source_suffixes))))
+sources += src/zroxy.c
 
 # If src_subdirs make variable is unset, use 'find' command to build list of sources.
 # Note that we use the same list of suffixes but tweak them for use with 'find'
@@ -26,7 +28,7 @@ ifeq ($(src_subdirs),)
   sources := $(shell find $(src_root) -type f $(foreach s,$(source_suffixes),$(if $(findstring $s,$(firstword $(source_suffixes))),,-o) -name '*$s'))
 endif
 
-$(info sources=(INCLUDE_DIRS))
+$(info sources=$(sources))
 
 # Build source -> object file mapping.
 # We want map $(src_root) -> $(build_root) and copy directory structure 

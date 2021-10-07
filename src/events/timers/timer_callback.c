@@ -14,10 +14,10 @@ zxy_event_handler_t* zxy_make_timer_handler(int32_t tfd, zxy_proxy_connection_t 
 {
     zxy_event_handler_t *handler = (zxy_event_handler_t *)malloc(sizeof(zxy_event_handler_t));
 
-    handler->sock_fd = tfd;
-    handler->callback = zxy_on_timer_event_callback;
-    handler->free_params = zxy_free_timer_params;
-    handler->params = (void *)proxy_handler;
+    // handler->sock_fd = tfd;
+    // handler->callback = zxy_on_timer_event_callback;
+    // handler->free_params = zxy_free_timer_params;
+    // handler->params = (void *)proxy_handler;
 
     return handler;
 }
@@ -37,7 +37,7 @@ void zxy_on_timer_event_callback(int32_t fd, uint32_t event, void *ptr)
     // {
     //     LOG_INFO("huhhhhhh2?\n");
     //     proxy_obj->timer_status_and_fd = TIMER_IS_UP;
-    //     remove_fd_from_epoll(fd);
+    //     zxy_remove_fd_from_epoll(fd);
     //     add_block_to_link_list(proxy_obj->timer_handler_ptr);
 
     //     if (!proxy_obj->backend_info.is_backend_closed)

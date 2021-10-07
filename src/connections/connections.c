@@ -22,22 +22,27 @@
 #include "connections/backend_conn_req.h"
 #include "connections/client_conn_req.h"
 #include "connections/conntypes/proxy_types.h"
+#include "events/peers/proxy_callbacks.h"
 
 
-zxy_event_handler_t* make_proxy_event_handler(zxy_proxy_connection_t* proxy_obj, int sock)
+zxy_event_handler_t* make_proxy_event_handler(zxy_proxy_connection_t* proxy_obj, int sock, int8_t sock_type)
 {
     zxy_event_handler_t* event_handler = (zxy_event_handler_t*)malloc(sizeof(zxy_event_handler_t));
 
     event_handler->sock_fd = sock;
     event_handler->params = (void*)proxy_obj;
-    //TODO: params free and proxy callback
+    event_handler->free_params = zxy_free_proxy_obj;
+    event_handler->sock_type = sock_type;
+    event_handler->callback = zxy_proxy_events_callback;
+    
+    return event_handler;
 }
 
 zxy_proxy_connection_t* zxy_make_proxy_connection(
             int32_t client_fd,
-            enum zxy_client_conn_type* client_conn_type, 
+            enum zxy_conn_type client_conn_type, 
             int32_t backend_fd,
-            enum zxy_backend_conn_type* backend_conn_type)
+            enum zxy_conn_type backend_conn_type)
 {
     zxy_proxy_connection_t *proxy_conn = (zxy_proxy_connection_t*)calloc(1, sizeof(zxy_proxy_connection_t));
 
@@ -47,7 +52,7 @@ zxy_proxy_connection_t* zxy_make_proxy_connection(
     return proxy_conn;
 }
 
-zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_client_conn_type client_conn_type)
+zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_conn_type client_conn_type)
 {
     zxy_client_base_t *client_base;
     switch (client_conn_type)
@@ -70,13 +75,13 @@ zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_cl
     return client_base;
 }
 
-zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy_backend_conn_type backend_conn_type)
+zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy_conn_type backend_conn_type)
 {
     zxy_backend_base_t *backend_base;
     switch (backend_conn_type)
     {
     case PLAIN_CONN: {
-        zxy_backend_conn_t *backend_plain_conn = zxy_make_client_plain_conn(backend_fd);
+        zxy_backend_conn_t *backend_plain_conn = zxy_make_backend_plain_conn(backend_fd);
         backend_base = zxy_make_backend_base_conn((void*)backend_plain_conn);
         zxy_set_up_backend_plain_base_callbacks(backend_base);
         break;
