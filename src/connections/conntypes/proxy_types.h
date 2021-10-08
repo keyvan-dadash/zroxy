@@ -11,24 +11,6 @@
 
 typedef void (*proxy_callback_func)(void*);
 
-typedef struct
-{
-    proxy_callback_func on_read;
-    proxy_callback_func on_write;
-    proxy_callback_func on_close;
-} zxy_callbacks_t;
-
-
-
-
-typedef struct
-{
-    int backend_sock_fd;
-    int client_sock_fd;
-    int timer_sock_fd;
-} zxy_connection_info_t;
-
-
 
 enum zxy_conn_type
 {
@@ -53,48 +35,6 @@ typedef struct
      */
     int refrence_counter;
 } zxy_proxy_connection_t;
-
-
-
-// typedef struct
-// {
-//     int client_sock_fd;
-//     int8_t is_client_closed;
-//     uint32_t client_events;
-//     client_handlers_t *client_handlers;
-
-//     char *read_buf;
-//     int32_t max_bufer_size;
-//     int32_t buffer_ptr;
-//     int8_t set_free;
-// } client_connection_info_t;
-
-// typedef struct
-// {
-//     int backend_sock_fd;
-//     int8_t is_backend_closed;
-//     uint32_t backend_events;
-//     backend_handlers_t *backend_handlers;
-
-//     char *read_buf;
-//     int32_t max_bufer_size;
-//     int32_t buffer_ptr;
-//     int8_t set_free;
-// } backend_connection_info_t;
-
-
-// typedef struct
-// {
-//     client_connection_info_t client_info;
-//     backend_connection_info_t backend_info;
-
-//     void *client_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
-//     void *backend_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
-//     void *timer_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
-
-//     int32_t timer_status_and_fd;
-// } proxy_handler_t;
-
 
 
 #endif /* PROXY_TYPES_H */

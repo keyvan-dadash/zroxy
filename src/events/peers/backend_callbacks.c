@@ -64,33 +64,10 @@ int zxy_on_backend_plain_read_event(void *ptr)
     zxy_nbyte_written_to_buffer(backend_conn->buffer_manager, nbytes);
 
     return nbytes;
-
-
-    // LOG_INFO("number of readed bytes is %d(back)\n", nbytes);
-
-    // backend_info->buffer_ptr += nbytes;
-    
-
-    // if (backend_info->max_bufer_size - 2 == nbytes)
-    // {
-    //     backend_info->read_buf[backend_info->max_bufer_size - 1] = '1';
-    // }
-
-    // client_connection_info_t *client_info = &( ((proxy_handler_t*)ptr)->client_info);
-
-    // if (!client_info->is_client_closed && is_writable_event(client_info->client_events)) {
-    //     client_info->client_handlers->on_write(ptr);
-    // }
 }
 
 int zxy_on_backend_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
 {
-    // client_connection_info_t *client_info = &( ((proxy_handler_t*)ptr)->client_info);
-    // if (client_info->buffer_ptr == 0)
-    //     return;
-
-    // backend_connection_info_t *backend_info = &( ((proxy_handler_t*)ptr)->backend_info);
-
     zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     int nbytes;
@@ -124,8 +101,6 @@ int zxy_on_backend_plain_close_event(void *ptr)
     close(backend_conn->sock_fd);
 
     return 1;
-
-    // add_block_to_link_list(((proxy_handler_t*)ptr)->backend_handler_ptr);
 }
 
 
@@ -201,33 +176,3 @@ void zxy_free_backend_plain(void *ptr)
 
     backend_base->set_free = 1;
 }
-
-
-
-// void zxy_backend_on_event_callback(int backend_sock_fd, uint32_t events, void *ptr)
-// {
-//     zxy_backend_base_t *backend_base = convert_backend_base(ptr);
-
-
-
-
-//     proxy_handler_t *proxy_obj = (proxy_handler_t*)ptr;
-//     proxy_obj->backend_info.backend_events = events;
-
-//     if (proxy_obj->backend_info.is_backend_closed || proxy_obj->timer_status_and_fd == TIMER_IS_UP)
-//         return;
-
-
-//     if ((events & EPOLLHUP) | (events & EPOLLERR)) {//Error or close
-//         proxy_obj->backend_info.backend_handlers->on_close(ptr);
-//         return;
-//     }
-
-//     if (events & EPOLLIN) { //Read ready
-//         proxy_obj->backend_info.backend_handlers->on_read(ptr);
-//     }
-
-//     if (events & EPOLLOUT) { //Write ready
-//         proxy_obj->backend_info.backend_handlers->on_write(ptr);
-//     }
-// }

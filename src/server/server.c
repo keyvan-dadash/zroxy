@@ -41,10 +41,7 @@ void zxy_accept_new_conn(int listen_fd, zxy_backend_addrs_t *addrs)
 
 void zxy_free_listen_fd_requirments(void *ptr)
 {
-    // backend_addrs_t *addrs = (backend_addrs_t*)ptr;
-
-    // free(addrs->backend_host);
-    // free(addrs->backend_port);
+    
 }
 
 void zxy_handle_accepting_connections(void *ptr, int listen_fd, uint32_t events)
