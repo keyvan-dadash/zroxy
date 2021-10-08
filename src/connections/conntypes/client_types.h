@@ -6,6 +6,9 @@
 
 #include <sys/types.h>
 
+#include <openssl/ssl.h>
+#include <openssl/bio.h>
+
 #include "utils/io/buffer_manager.h"
 #include "utils/io/io_helper.h"
 
@@ -82,6 +85,56 @@ typedef struct
 } zxy_client_conn_t;
 
 
+
+/**
+ * client ssl connection
+ */
+typedef struct 
+{
+    /**
+     * sock fd properties
+     */
+    int sock_fd;
+    int8_t is_closed;
+    u_int32_t events;
+
+    /**
+     * SSL Obj
+     */
+    SSL *ssl;
+
+
+    /**
+     * BIO objects for reading and writing non block
+     */
+    BIO *rbio;
+    BIO *wbio;
+
+
+    /**
+     * encrypt buffer manager which is controll data which is should go through ssl for encryption
+     */
+    zxy_buffer_manager_t *encrypt_buffer_manager;
+
+
+    /**
+     * buffer which is should write to sockets
+     */
+    zxy_buffer_manager_t *writing_buffer_manager;
+
+
+    /**
+     * buffer which is should read
+     */
+    zxy_buffer_manager_t *read_buffer_manager;
+
+
+    /**
+     * should free?
+     */
+    int8_t set_free;
+
+} zxy_client_ssl_conn_t;
 
 
 
