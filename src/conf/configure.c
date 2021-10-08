@@ -24,6 +24,8 @@ zxy_server_configs_t zxy_get_server_configs_from_file(char *filename)
     char *zroxy_port = strdup("zroxy_port");
 
     server_configs.server_port = get_string_option(L, zroxy_port);
+
+    free(zroxy_port);
     
     return server_configs;
 }
@@ -43,6 +45,9 @@ zxy_proxy_configs_t zxy_get_proxy_configs_from_file(char *filename)
 
     proxy_configs.proxy_address = get_string_option(L, server_address);
     proxy_configs.proxy_port = get_string_option(L, server_port);
+
+    free(server_address);
+    free(server_port);
     
     return proxy_configs;    
 }
@@ -62,6 +67,9 @@ zxy_certificates_configs_t zxy_get_certificates_configs_from_file(char *filename
     certificates_configs.certificate_path = get_string_option(L, certificate_path);
     certificates_configs.private_key_path = get_string_option(L, privkey_path);
 
+    free(certificate_path);
+    free(privkey_path);
+    
     return certificates_configs;
 }
 

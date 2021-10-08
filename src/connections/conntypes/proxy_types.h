@@ -18,17 +18,14 @@ typedef struct
     proxy_callback_func on_close;
 } zxy_callbacks_t;
 
+
+
+
 typedef struct
 {
-    int sock_fd;
-    int8_t is_closed;
-    u_int32_t events;
-    zxy_callbacks_t *callback_funcs;
-
-    char *read_buffer;
-    int32_t max_bufer_size;
-    int32_t buffer_location_ptr;
-    int8_t set_free;
+    int backend_sock_fd;
+    int client_sock_fd;
+    int timer_sock_fd;
 } zxy_connection_info_t;
 
 
@@ -50,6 +47,11 @@ typedef struct
     void *timer_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
 
     int32_t timer_status_and_fd;
+
+    /**
+     * refrence counter
+     */
+    int refrence_counter;
 } zxy_proxy_connection_t;
 
 

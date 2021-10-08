@@ -22,7 +22,7 @@
 
 zxy_client_conn_t* convert_client_conn(void *ptr)
 {
-    return (zxy_client_conn_t*)ptr;
+    return (zxy_client_conn_t*)(((zxy_client_base_t*)ptr)->params);
 }
 
 zxy_client_base_t* convert_client_base(void *ptr)
@@ -165,12 +165,16 @@ int zxy_client_plain_force_close(void *ptr)
 {
     zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
-    zxy_remove_fd_from_epoll(client_conn->sock_fd);
-    LOG_INFO("backend fd(%d) closed the connection\n", client_conn->sock_fd);
-    client_conn->is_closed = 1;
-    close(client_conn->sock_fd);
+    if (client_conn->is_closed != 1) {
+        zxy_remove_fd_from_epoll(client_conn->sock_fd);
+        LOG_INFO("backend fd(%d) closed the connection\n", client_conn->sock_fd);
+        client_conn->is_closed = 1;
+        close(client_conn->sock_fd);
 
-    return 1;
+        return 1;
+    }
+
+    return 0;
 }
 
 int zxy_client_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr)
@@ -206,11 +210,14 @@ int zxy_client_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, vo
 
 void zxy_free_client_plain(void *ptr)
 {
+    zxy_client_base_t *client_base = convert_client_base(ptr);
     zxy_client_conn_t *client_conn = convert_client_conn(ptr);
 
     zxy_free_buffer_manager(client_conn->buffer_manager);
     
     free(client_conn);
+
+    client_base->set_free = 1;
 }
 
 

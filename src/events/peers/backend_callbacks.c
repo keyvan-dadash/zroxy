@@ -21,7 +21,7 @@
 
 zxy_backend_conn_t* convert_backend_conn(void *ptr)
 {
-    return (zxy_backend_conn_t*)ptr;
+    return (zxy_backend_conn_t*)(((zxy_backend_base_t*)ptr)->params);
 }
 
 zxy_backend_base_t* convert_backend_base(void *ptr)
@@ -147,6 +147,7 @@ zxy_write_io_req_t zxy_backend_plain_request_buffer_reader(void *ptr)
 int zxy_backend_plain_force_close(void *ptr)
 {
     zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
+
     if (backend_conn->is_closed != 1) {
         zxy_remove_fd_from_epoll(backend_conn->sock_fd);
         LOG_INFO("backend fd(%d) closed the connection\n", backend_conn->sock_fd);
@@ -191,11 +192,14 @@ int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, v
 
 void zxy_free_backend_plain(void *ptr)
 {
+    zxy_backend_base_t *backend_base = convert_backend_base(ptr);
     zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     zxy_free_buffer_manager(backend_conn->buffer_manager);
     
     free(backend_conn);
+
+    backend_base->set_free = 1;
 }
 
 

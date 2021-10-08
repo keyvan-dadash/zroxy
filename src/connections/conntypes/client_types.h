@@ -49,6 +49,11 @@ typedef struct
      * 
      */
     void *params;
+
+    /**
+     * should free?
+     */
+    int8_t set_free;
 } zxy_client_base_t;
 
 

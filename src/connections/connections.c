@@ -29,6 +29,9 @@ zxy_event_handler_t* make_proxy_event_handler(zxy_proxy_connection_t* proxy_obj,
 {
     zxy_event_handler_t* event_handler = (zxy_event_handler_t*)malloc(sizeof(zxy_event_handler_t));
 
+    //add refrence 
+    proxy_obj->refrence_counter++;
+
     event_handler->sock_fd = sock;
     event_handler->params = (void*)proxy_obj;
     event_handler->free_params = zxy_free_proxy_obj;
@@ -48,6 +51,7 @@ zxy_proxy_connection_t* zxy_make_proxy_connection(
 
     proxy_conn->client = zxy_make_client_conn_with_type(client_fd, client_conn_type);
     proxy_conn->backend = zxy_make_backend_conn_with_type(backend_fd, backend_conn_type);
+    proxy_conn->refrence_counter = 0;
 
     return proxy_conn;
 }

@@ -50,6 +50,11 @@ typedef struct
      * 
      */
     void *params;
+
+    /**
+     * should free?
+     */
+    int8_t set_free;
 } zxy_backend_base_t;
 
 

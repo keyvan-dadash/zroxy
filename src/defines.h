@@ -21,5 +21,6 @@
 #define CLIENT_SOCK 101
 #define BACKEND_SOCK 102
 #define PROXY_TIMER_SOCK 103
+#define FREED_SOCK 104
 
 #endif /* DEFINES_H */
