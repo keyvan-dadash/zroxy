@@ -9,15 +9,15 @@
 
 #include "defines.h"
 
-#include "connections/backend_conn_req.h"
+#include "connections//plain/backend_conn_req.h"
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/backend_types.h"
-#include "events/peers/backend_callbacks.h"
+#include "events/peers/plain/backend_callbacks.h"
 
 #include "utils/io/buffer_manager.h"
 
 
-zxy_backend_base_t* zxy_make_backend_base_conn(void *params)
+zxy_backend_base_t* zxy_make_plain_backend_base_conn(void *params)
 {
     zxy_backend_base_t *backend_base_conn = (zxy_backend_base_t*)calloc(1, sizeof(zxy_backend_base_t));
 

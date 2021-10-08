@@ -12,8 +12,8 @@
 
 #include "logging/logs.h"
 #include "connections/connections.h"
-#include "connections/backend_conn_req.h"
-#include "connections/client_conn_req.h"
+#include "connections/plain/backend_conn_req.h"
+#include "connections/plain/client_conn_req.h"
 #include "connections/conntypes/proxy_types.h"
 #include "events/peers/proxy_callbacks.h"
 
@@ -56,7 +56,7 @@ zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_co
     {
     case PLAIN_CONN: {
         zxy_client_conn_t *client_plain_conn = zxy_make_client_plain_conn(client_fd);
-        client_base = zxy_make_client_base_conn((void*)client_plain_conn);
+        client_base = zxy_make_plain_client_base_conn((void*)client_plain_conn);
         zxy_set_up_client_plain_base_callbacks(client_base);
         break;
     }
@@ -79,7 +79,7 @@ zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy
     {
     case PLAIN_CONN: {
         zxy_backend_conn_t *backend_plain_conn = zxy_make_backend_plain_conn(backend_fd);
-        backend_base = zxy_make_backend_base_conn((void*)backend_plain_conn);
+        backend_base = zxy_make_plain_backend_base_conn((void*)backend_plain_conn);
         zxy_set_up_backend_plain_base_callbacks(backend_base);
         break;
     }

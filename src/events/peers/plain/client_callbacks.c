@@ -14,7 +14,7 @@
 #include "defines.h"
 
 #include "connections/conntypes/client_types.h"
-#include "events/peers/client_callbacks.h"
+#include "events/peers/plain/client_callbacks.h"
 #include "logging/logs.h"
 #include "utils/io/io_helper.h"
 #include "utils/io/buffer_manager.h"

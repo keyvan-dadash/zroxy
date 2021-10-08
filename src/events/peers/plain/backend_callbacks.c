@@ -12,7 +12,7 @@
 
 #include "defines.h"
 #include "connections/conntypes/backend_types.h"
-#include "events/peers/backend_callbacks.h"
+#include "events/peers/plain/backend_callbacks.h"
 #include "logging/logs.h"
 #include "utils/io/io_helper.h"
 #include "utils/io/buffer_manager.h"

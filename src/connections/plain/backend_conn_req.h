@@ -12,7 +12,7 @@
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/backend_types.h"
 
-zxy_backend_base_t* zxy_make_backend_base_conn(void *params);
+zxy_backend_base_t* zxy_make_plain_backend_base_conn(void *params);
 
 
 //////// plain connections

@@ -10,7 +10,7 @@
 #include "connections/conntypes/client_types.h"
 
 
-zxy_client_base_t* zxy_make_client_base_conn(void *params);
+zxy_client_base_t* zxy_make_plain_client_base_conn(void *params);
 
 
 /////////// pain connection /////////////

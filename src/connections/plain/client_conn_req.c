@@ -7,17 +7,17 @@
 
 #include "defines.h"
 
-#include "connections/client_conn_req.h"
+#include "connections/plain/client_conn_req.h"
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/client_types.h"
-#include "events/peers/client_callbacks.h"
+#include "events/peers/plain/client_callbacks.h"
 
 #include "utils/io/buffer_manager.h"
 
 
 
 
-zxy_client_base_t* zxy_make_client_base_conn(void *params)
+zxy_client_base_t* zxy_make_plain_client_base_conn(void *params)
 {
     zxy_client_base_t *client_base_conn = (zxy_client_base_t*)calloc(1, sizeof(zxy_client_base_t));
 
