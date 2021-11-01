@@ -99,20 +99,6 @@ void zxy_handle_client_events(
         return;
     }
 
-    if (client_base->is_ready_event(events, WRITE_EVENT, client_base)) {
-        zxy_write_io_req_t write_req = backend_base->request_buffer_reader(backend_base);
-
-        // LOG_INFO("write\n");
-        // if (write_req.send_nbytes > 0)
-            client_base->on_write((void*)client_base, &write_req);
-        
-        zxy_check_backend_close(
-            proxy_conn,
-            backend_base,
-            client_base
-        );
-    }
-
     if (client_base->is_ready_event(events, READ_EVENT, client_base)) {
         if (zxy_check_backend_close(
             proxy_conn,
@@ -131,6 +117,19 @@ void zxy_handle_client_events(
         }
     }
 
+    if (client_base->is_ready_event(events, WRITE_EVENT, client_base)) {
+        zxy_write_io_req_t write_req = backend_base->request_buffer_reader(backend_base);
+
+        // LOG_INFO("write\n");
+        // if (write_req.send_nbytes > 0)
+            client_base->on_write((void*)client_base, &write_req);
+        
+        zxy_check_backend_close(
+            proxy_conn,
+            backend_base,
+            client_base
+        );
+    }
 
 }
 
@@ -144,19 +143,6 @@ void zxy_handle_backend_events(
         backend_base->on_close(backend_base);
         // backend_base->free_params(backend_base);
         return;
-    }
-
-    if (backend_base->is_ready_event(events, WRITE_EVENT, backend_base)) {
-        zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);
-
-        if (write_req.send_nbytes > 0)
-            backend_base->on_write((void*)backend_base, &write_req);
-
-        zxy_check_client_close(
-            proxy_conn,
-            backend_base,
-            client_base
-        );
     }
 
     if (backend_base->is_ready_event(events, READ_EVENT, backend_base)) {
@@ -173,6 +159,20 @@ void zxy_handle_backend_events(
 
             client_base->on_write((void*)client_base, &write_req);
         }
+    }
+
+    if (backend_base->is_ready_event(events, WRITE_EVENT, backend_base)) {
+        zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);
+
+        LOG_INFO("hoho:%d %s\n", write_req.send_nbytes, write_req.buffer);
+        if (write_req.send_nbytes > 0)
+            backend_base->on_write((void*)backend_base, &write_req);
+
+        zxy_check_client_close(
+            proxy_conn,
+            backend_base,
+            client_base
+        );
     }
 }
 

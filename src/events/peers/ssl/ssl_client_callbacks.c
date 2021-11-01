@@ -217,7 +217,8 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
             n = SSL_read(client_conn->ssl, buf, sizeof(buf));
             // if (n > 0)
             //     client.io_on_read(buf, (size_t)n);
-            LOG_INFO("soo: %.*s\n", (int)n, buf);
+            if (n > 0)
+                LOG_INFO("soo: %.*s\n", (int)n, buf);
         } while (n > 0);
 
         status = get_sslstatus(client_conn->ssl, n);
@@ -264,12 +265,15 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
     write_req->clear_nbytes = client_conn->writing_buffer_manager->current_buffer_ptr;
 
     if (write_req->send_nbytes <= 0) {
+        LOG_INFO("wtfff dude\n");
         return 0;
     }
 
     nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
-    zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
+    client_conn->writing_buffer_manager->current_buffer_ptr = 0;
+
+    // zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
@@ -281,7 +285,7 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         return UNKOWN_ERROR;
     }
 
-    LOG_INFO("number of written bytes is %d(in send client)\n", nbytes);
+    LOG_INFO("number of written bytes is %d(in ssl send client)\n", nbytes);
     
     return nbytes;
 }

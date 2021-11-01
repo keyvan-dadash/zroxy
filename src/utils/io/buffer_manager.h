@@ -15,6 +15,7 @@ typedef struct
      * buffer ptr which is represent where should we start writing to buffer
      */ 
     int current_buffer_ptr;
+    int tail;
 } zxy_buffer_manager_t;
 
 

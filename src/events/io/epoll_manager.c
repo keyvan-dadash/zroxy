@@ -82,6 +82,8 @@ void zxy_event_loop(int server_fd)
 
             zxy_event_handler_t *handler = (zxy_event_handler_t*) events[i].data.ptr;
 
+            // LOG_INFO("%d\n", handler->sock_fd);
+
             handler->callback(handler, handler->sock_fd, events[i].events);
 
         }

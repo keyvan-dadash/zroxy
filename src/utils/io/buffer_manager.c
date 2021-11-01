@@ -18,6 +18,7 @@ zxy_buffer_manager_t* zxy_malloc_buffer_manager_with_buffer_size(int max_buffer_
 
     buffer_manager->max_size_of_buffer = max_buffer_size;
     buffer_manager->current_buffer_ptr = 0;
+    buffer_manager->tail = 0;
 
     return buffer_manager;
 }
@@ -69,7 +70,7 @@ void zxy_nbyte_written_to_buffer(zxy_buffer_manager_t* buffer_manager, int32_t n
 
 void zxy_nbyte_readed_from_buffer(zxy_buffer_manager_t* buffer_manager, int32_t nbytes)
 {
-    buffer_manager->current_buffer_ptr -= nbytes;
+    buffer_manager->buffer += nbytes;
 }
 
 void zxy_clean_nbytes_from_buffer(zxy_buffer_manager_t* buffer_manager, int32_t nbytes)

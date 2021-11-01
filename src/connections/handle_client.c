@@ -69,6 +69,8 @@ void zxy_handle_client_connection(int client_sock, char *backend_host, char *bac
     //create and register client
     zxy_event_handler_t *client_handler = make_proxy_event_handler(proxy_obj, client_sock, CLIENT_SOCK);
     proxy_obj->client_handler_ptr = client_handler;
+
+    //TODO: wtffff just happend about edge trigger
     zxy_add_handler_to_epoll(client_handler, EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLERR);
 
     //create and register backend
