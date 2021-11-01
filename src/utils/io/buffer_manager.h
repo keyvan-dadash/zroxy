@@ -22,6 +22,8 @@ zxy_buffer_manager_t* zxy_malloc_buffer_manager_with_buffer_size(int max_buffer_
 
 int zxy_double_buffer_size(zxy_buffer_manager_t*);
 
+int zxy_resize_to_prefer_buffer_size(zxy_buffer_manager_t*, int32_t);
+
 int zxy_should_resize_buffer(zxy_buffer_manager_t*);
 
 void zxy_free_buffer_manager(zxy_buffer_manager_t*);
@@ -29,6 +31,8 @@ void zxy_free_buffer_manager(zxy_buffer_manager_t*);
 int zxy_can_write_nbytes_to_buffer(zxy_buffer_manager_t*, int32_t);
 
 void zxy_nbyte_written_to_buffer(zxy_buffer_manager_t*, int32_t);
+
+void zxy_nbyte_readed_from_buffer(zxy_buffer_manager_t*, int32_t);
 
 void zxy_clean_nbytes_from_buffer(zxy_buffer_manager_t*, int32_t);
 

@@ -31,6 +31,20 @@ int zxy_double_buffer_size(zxy_buffer_manager_t* buffer_manager)
     return buffer_manager->max_size_of_buffer;
 }
 
+int zxy_resize_to_prefer_buffer_size(zxy_buffer_manager_t* buffer_manager, int32_t prefer_size)
+{
+    buffer_manager->buffer = (char *)realloc(buffer_manager->buffer, prefer_size);
+
+    if (prefer_size > buffer_manager->max_size_of_buffer) {
+        memset((buffer_manager->buffer + buffer_manager->max_size_of_buffer), '\0', prefer_size - buffer_manager->max_size_of_buffer);
+    }
+    
+    buffer_manager->max_size_of_buffer = prefer_size;
+
+    return buffer_manager->max_size_of_buffer;
+}
+
+
 int zxy_should_resize_buffer(zxy_buffer_manager_t* buffer_manager)
 {
     return buffer_manager->buffer[buffer_manager->max_size_of_buffer - 1] != '\0';
