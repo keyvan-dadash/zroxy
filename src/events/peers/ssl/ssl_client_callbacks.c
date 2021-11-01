@@ -21,6 +21,10 @@
 #include "utils/timer/timers.h"
 
 
+int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed_bytes);
+
+int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn);
+
 enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};
 
 static enum sslstatus get_sslstatus(SSL* ssl, int n)
@@ -141,7 +145,11 @@ int zxy_on_client_ssl_read_event(void *ptr)
 
     zxy_nbyte_written_to_buffer(client_conn->read_buffer_manager, nbytes);
 
-    zxy_proccess_ssl_bytes(client_conn, read_nbytes);
+    int result = zxy_proccess_ssl_bytes(client_conn, read_nbytes);
+
+    if (result) {
+        LOG_ERROR("something bad happend\n");
+    }
 
     return nbytes;
 }
@@ -164,8 +172,10 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
             number_readed_bytes
         );
 
-        if (n < 0)
+        if (n < 0) {
+            LOG_INFO("bad bad\n");
             return UNKOWN_ERROR;
+        }
 
         base_read_ptr += n;
         number_readed_bytes -= n;
@@ -179,17 +189,52 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
                     n = BIO_read(client_conn->wbio, buf, sizeof(buf));
                     if (n > 0)
                         zxy_queue_encrypted_bytes(client_conn, buf, n);
-                    else if (!BIO_should_retry(client_conn->wbio))
+                    else if (!BIO_should_retry(client_conn->wbio)) {
+                        LOG_INFO("bad bad1\n");
                         return -1;
+                    }
                 } while(n > 0);
             }
 
+
             if (status == SSLSTATUS_FAIL) {
+                LOG_INFO("bad bad2\n");
                 return UNKOWN_ERROR;
             }
 
+            LOG_INFO("babababababab1111\n");
+
             if (!SSL_is_init_finished(client_conn->ssl))
                 return 0;
+        }
+
+        LOG_INFO("babababababab\n");
+
+        do {
+            n = SSL_read(client_conn->ssl, buf, sizeof(buf));
+            // if (n > 0)
+            //     client.io_on_read(buf, (size_t)n);
+            LOG_INFO("soo: %.*s\n", (int)n, buf);
+        } while (n > 0);
+
+        status = get_sslstatus(client_conn->ssl, n);
+
+        /* Did SSL request to write bytes? This can happen if peer has requested SSL
+        * renegotiation. */
+        if (status == SSLSTATUS_WANT_IO)
+        do {
+            n = BIO_read(client_conn->wbio, buf, sizeof(buf));
+            if (n > 0)
+                zxy_queue_encrypted_bytes(client_conn, buf, n);
+            else if (!BIO_should_retry(client_conn->wbio)) {
+                LOG_INFO("bad bad3\n");
+                return UNKOWN_ERROR;
+            }
+        } while (n>0);
+
+        if (status == SSLSTATUS_FAIL) {
+            LOG_INFO("bad bad3\n");
+            return UNKOWN_ERROR;
         }
 
     }
@@ -242,38 +287,38 @@ int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn)
         status = get_sslstatus(client_conn->ssl, n);
 
         if (n > 0) {
-        /* consume the waiting bytes that have been used by SSL */
-        if ((size_t)n < client_conn->encrypt_buffer_manager->current_buffer_ptr) {
-            memmove(
-                client_conn->encrypt_buffer_manager->buffer, 
-                client_conn->encrypt_buffer_manager->current_buffer_ptr + n, 
-                client_conn->encrypt_buffer_manager->current_buffer_ptr - n
-            );
-        }
-
-        zxy_nbyte_readed_from_buffer(client_conn->encrypt_buffer_manager, n);
-
-        zxy_resize_to_prefer_buffer_size(
-            client_conn->encrypt_buffer_manager, 
-            client_conn->encrypt_buffer_manager->current_buffer_ptr);
-
-        /* take the output of the SSL object and queue it for socket write */
-        do {
-            n = BIO_read(client_conn->wbio, buf, sizeof(buf));
-            if (n > 0) {
-                zxy_queue_encrypted_bytes(client_conn, buf, n);
+            /* consume the waiting bytes that have been used by SSL */
+            if ((size_t)n < client_conn->encrypt_buffer_manager->current_buffer_ptr) {
+                memmove(
+                    client_conn->encrypt_buffer_manager->buffer, 
+                    client_conn->encrypt_buffer_manager->buffer + n, 
+                    client_conn->encrypt_buffer_manager->current_buffer_ptr - n
+                );
             }
-            else if (!BIO_should_retry(client_conn->wbio)) {
-                return -1;
-            }
-        } while (n>0);
+
+            zxy_nbyte_readed_from_buffer(client_conn->encrypt_buffer_manager, n);
+
+            zxy_resize_to_prefer_buffer_size(
+                client_conn->encrypt_buffer_manager, 
+                client_conn->encrypt_buffer_manager->current_buffer_ptr);
+
+            /* take the output of the SSL object and queue it for socket write */
+            do {
+                n = BIO_read(client_conn->wbio, buf, sizeof(buf));
+                if (n > 0) {
+                    zxy_queue_encrypted_bytes(client_conn, buf, n);
+                }
+                else if (!BIO_should_retry(client_conn->wbio)) {
+                    return -1;
+                }
+            } while (n>0);
         }
 
         if (status == SSLSTATUS_FAIL)
-        return -1;
+            return -1;
 
         if (n==0)
-        break;
+            break;
     }
     return 0;
 }
@@ -321,7 +366,7 @@ int zxy_client_ssl_force_close(void *ptr)
 
 int zxy_client_ssl_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void* ptr)
 {
-    zxy_client_conn_t *client_conn = convert_client_conn(ptr);
+    zxy_client_ssl_conn_t *client_conn = convert_client_ssl_conn(ptr);
 
     if (events != -1) {
         client_conn->events = events;

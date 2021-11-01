@@ -11,9 +11,14 @@
 #include <netdb.h>
 
 #include "logging/logs.h"
+#include "defines.h"
 #include "connections/connections.h"
+
 #include "connections/plain/backend_conn_req.h"
 #include "connections/plain/client_conn_req.h"
+
+#include "connections/ssl/client_ssl_conn_req.h"
+
 #include "connections/conntypes/proxy_types.h"
 #include "events/peers/proxy_callbacks.h"
 
@@ -62,7 +67,10 @@ zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_co
     }
 
     case SSL_CONN: {
-        //TODO: handle ssl
+        LOG_INFO("wtfffff\n");
+        zxy_client_ssl_conn_t *client_ssl_conn = zxy_make_client_ssl_conn(ctx, client_fd);
+        client_base = zxy_make_ssl_client_base_conn((void*)client_ssl_conn);
+        zxy_set_up_client_ssl_base_callbacks(client_base);
         break;
     }
     default:

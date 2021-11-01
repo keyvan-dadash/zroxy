@@ -67,7 +67,7 @@ void zxy_event_loop(int server_fd)
     struct epoll_event events[MAX_EVENTS];
 
     while (1) {
-        LOG_INFO("fuck1\n");
+        // LOG_INFO("fuck1\n");
         nfd = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
 
         if (nfd == 0) {
@@ -76,7 +76,7 @@ void zxy_event_loop(int server_fd)
             LOG_FATAL(-1, "Epoll crashed: %s", strerror(errno));
         }
 
-        LOG_INFO("fuck\n");
+        // LOG_INFO("fuck\n");
 
         for (int i = 0; i < nfd; i++) {
 
@@ -91,7 +91,7 @@ void zxy_event_loop(int server_fd)
         while (entry != NULL) { //free handler objects
             zxy_event_handler_t *handler = (zxy_event_handler_t *)entry->block;
             handler->free_params(handler->params);
-            LOG_INFO("fuckkkkkkkkkkkkkkkkkkkkkkkkkkk\n");
+            // LOG_INFO("fuckkkkkkkkkkkkkkkkkkkkkkkkkkk\n");
             free(entry->block);
             local_entry = entry->next;
             free(entry);

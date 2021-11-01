@@ -1,8 +1,11 @@
 
 
+#include <openssl/ssl.h>
+
 #ifndef DEFINES_H
 #define DEFINES_H
 
+SSL_CTX *ctx;
 
 #define READ_BUF_SIZE 4096
 

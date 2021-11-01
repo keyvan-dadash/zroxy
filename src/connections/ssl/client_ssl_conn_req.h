@@ -18,7 +18,7 @@ zxy_client_base_t* zxy_make_ssl_client_base_conn(void *params);
 
 zxy_client_ssl_conn_t* zxy_make_client_ssl_conn(SSL_CTX *ctx, int sock_fd);
 
-void zxy_set_up_client_ssl_base_callbacks(zxy_client_ssl_conn_t* client_base);
+void zxy_set_up_client_ssl_base_callbacks(zxy_client_base_t* client_base);
 
 
 
