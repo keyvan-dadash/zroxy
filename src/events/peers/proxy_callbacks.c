@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "defines.h"
+#include "logging/logs.h"
 #include "events/io/epoll_manager.h"
 #include "events/peers/proxy_callbacks.h"
 #include "events/timers/timer_callback.h"
@@ -94,13 +95,15 @@ void zxy_handle_client_events(
     if (client_base->is_ready_event(events, CLOSE_EVENT, client_base)) {
         client_base->on_close(client_base);
         // client_base->free_params(client_base);
+        // LOG_INFO("close\n");
         return;
     }
 
     if (client_base->is_ready_event(events, WRITE_EVENT, client_base)) {
         zxy_write_io_req_t write_req = backend_base->request_buffer_reader(backend_base);
 
-        if (write_req.send_nbytes > 0)
+        // LOG_INFO("write\n");
+        // if (write_req.send_nbytes > 0)
             client_base->on_write((void*)client_base, &write_req);
         
         zxy_check_backend_close(
@@ -118,6 +121,8 @@ void zxy_handle_client_events(
         )) return;
 
         int read_bytes = client_base->on_read((void*)client_base);
+
+        // LOG_INFO("read %d\n", read_bytes);
 
         if (read_bytes > 0 && backend_base->is_ready_event(-1, WRITE_EVENT, backend_base)) {
             zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);

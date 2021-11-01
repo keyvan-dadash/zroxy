@@ -131,6 +131,9 @@ int zxy_on_client_ssl_read_event(void *ptr)
 
     nbytes = zxy_read_socket_non_block(&read_req);
 
+    LOG_INFO("%d: %d\n", client_conn->sock_fd, nbytes);
+    // fflush(stdout);
+
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
         return 0; //TODO: some how signal close state
@@ -250,11 +253,23 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         
     write_req->req_fd = client_conn->sock_fd;
 
+    LOG_INFO("write req: %d\n", write_req->send_nbytes);
+
     zxy_queue_unencrypted_bytes(client_conn, write_req->buffer, write_req->send_nbytes);
 
     zxy_encrypt_io_req(client_conn);
 
+    write_req->buffer = client_conn->writing_buffer_manager->buffer;
+    write_req->send_nbytes = client_conn->writing_buffer_manager->current_buffer_ptr;
+    write_req->clear_nbytes = client_conn->writing_buffer_manager->current_buffer_ptr;
+
+    if (write_req->send_nbytes <= 0) {
+        return 0;
+    }
+
     nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
+
+    zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
 
     if (nbytes == 0) {
         LOG_WARNING("we should going to close\n");
