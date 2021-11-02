@@ -8,6 +8,7 @@ async def echo_handler(reader, writer):
   address = writer.get_extra_info('peername')
   logger.debug('accept: %s', address)
   message = await reader.readline()
+  print(message)
   writer.write(message)
   await writer.drain()
   writer.close()

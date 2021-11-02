@@ -70,7 +70,7 @@ void zxy_nbyte_written_to_buffer(zxy_buffer_manager_t* buffer_manager, int32_t n
 
 void zxy_nbyte_readed_from_buffer(zxy_buffer_manager_t* buffer_manager, int32_t nbytes)
 {
-    buffer_manager->buffer += nbytes;
+    buffer_manager->current_buffer_ptr -= nbytes;
 }
 
 void zxy_clean_nbytes_from_buffer(zxy_buffer_manager_t* buffer_manager, int32_t nbytes)

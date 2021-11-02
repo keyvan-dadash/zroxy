@@ -51,7 +51,7 @@ int zxy_on_backend_plain_read_event(void *ptr)
     nbytes = zxy_read_socket_non_block(&read_req);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close\n");
+        LOG_WARNING("we should going to close(backend)\n");
         return 0; //TODO: some how signal close state
     } else if (nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;
@@ -77,7 +77,7 @@ int zxy_on_backend_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
     nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close\n");
+        LOG_WARNING("we should going to close(backend)\n");
         return 0;
     } else if (nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;

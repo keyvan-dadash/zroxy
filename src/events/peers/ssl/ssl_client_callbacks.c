@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include <openssl/err.h>
+
 #include "defines.h"
 
 #include "connections/conntypes/client_types.h"
@@ -29,7 +31,10 @@ enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};
 
 static enum sslstatus get_sslstatus(SSL* ssl, int n)
 {
-  switch (SSL_get_error(ssl, n))
+
+  int error = SSL_get_error(ssl, n);
+
+  switch (error)
   {
     case SSL_ERROR_NONE:
       return SSLSTATUS_OK;
@@ -39,6 +44,7 @@ static enum sslstatus get_sslstatus(SSL* ssl, int n)
     case SSL_ERROR_ZERO_RETURN:
     case SSL_ERROR_SYSCALL:
     default:
+      LOG_INFO("%s\n", ERR_error_string(ERR_get_error(), NULL));
       return SSLSTATUS_FAIL;
   }
 }
@@ -135,9 +141,10 @@ int zxy_on_client_ssl_read_event(void *ptr)
     // fflush(stdout);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close\n");
+        LOG_WARNING("we should going to close(ssl client)\n");
         return 0; //TODO: some how signal close state
     } else if (nbytes == WOULD_BLOCK) {
+        LOG_ERROR("fuck in recv11\n");
         return WOULD_BLOCK;
     } else if (nbytes == UNKOWN_ERROR) {
         LOG_ERROR("fuck in recv\n");
@@ -148,7 +155,19 @@ int zxy_on_client_ssl_read_event(void *ptr)
 
     zxy_nbyte_written_to_buffer(client_conn->read_buffer_manager, nbytes);
 
+    LOG_INFO("total bytes: %d\n", client_conn->read_buffer_manager->current_buffer_ptr);
+
     int result = zxy_proccess_ssl_bytes(client_conn, read_nbytes);
+
+    // zxy_clean_nbytes_from_buffer(client_conn->read_buffer_manager, client_conn->read_buffer_manager->current_buffer_ptr);
+    // client_conn->read_buffer_manager->current_buffer_ptr = 0;
+
+    memmove(
+        client_conn->read_buffer_manager->buffer, 
+        client_conn->read_buffer_manager->buffer + nbytes, 
+        client_conn->read_buffer_manager->current_buffer_ptr - nbytes
+    );
+    zxy_nbyte_readed_from_buffer(client_conn->read_buffer_manager, nbytes);
 
     if (result) {
         LOG_ERROR("something bad happend\n");
@@ -167,6 +186,9 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
     int base_read_ptr = 0;
     enum sslstatus status;
 
+
+    // LOG_INFO("go read %d\n", number_readed_bytes);
+
     while (number_readed_bytes > 0) {
 
         n = BIO_write(
@@ -175,17 +197,28 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
             number_readed_bytes
         );
 
-        if (n < 0) {
+        if (n <= 0) {
             LOG_INFO("bad bad\n");
             return UNKOWN_ERROR;
         }
 
         base_read_ptr += n;
         number_readed_bytes -= n;
+
+        LOG_INFO("go read %d\n", n);
         
         if (!SSL_is_init_finished(client_conn->ssl)) {
             n = SSL_accept(client_conn->ssl);
+
+            if (n < 0) {
+                int error = SSL_get_error(client_conn->ssl, n);
+                LOG_INFO("%d %s\n", error, ERR_error_string(ERR_get_error(), NULL));
+            }
+
+
             status = get_sslstatus(client_conn->ssl, n);
+
+            LOG_INFO("before babababababab1111 %d\n", n);
 
             if (status == SSLSTATUS_WANT_IO) {
                 do {
@@ -205,7 +238,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
                 return UNKOWN_ERROR;
             }
 
-            LOG_INFO("babababababab1111\n");
+            LOG_INFO("babababababab1111 %d\n", n);
 
             if (!SSL_is_init_finished(client_conn->ssl))
                 return 0;
@@ -271,12 +304,17 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
 
     nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
-    client_conn->writing_buffer_manager->current_buffer_ptr = 0;
+    // client_conn->writing_buffer_manager->current_buffer_ptr = 0;
 
-    // zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
+    memmove(
+        client_conn->writing_buffer_manager->buffer, 
+        client_conn->writing_buffer_manager->buffer + nbytes, 
+        client_conn->writing_buffer_manager->current_buffer_ptr - nbytes
+    );
+    zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close\n");
+        LOG_WARNING("we should going to close(ssl client)\n");
         return 0;
     } else if (nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;

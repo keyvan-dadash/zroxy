@@ -108,10 +108,12 @@ void zxy_handle_client_events(
 
         int read_bytes = client_base->on_read((void*)client_base);
 
-        // LOG_INFO("read %d\n", read_bytes);
+        LOG_INFO("read %d\n", read_bytes);
 
         if (read_bytes > 0 && backend_base->is_ready_event(-1, WRITE_EVENT, backend_base)) {
             zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);
+
+            LOG_INFO("number of requested write: %d\n", write_req.send_nbytes);
 
             backend_base->on_write((void*)backend_base, &write_req);
         }
