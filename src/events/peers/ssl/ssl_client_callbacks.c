@@ -250,8 +250,23 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
             n = SSL_read(client_conn->ssl, buf, sizeof(buf));
             // if (n > 0)
             //     client.io_on_read(buf, (size_t)n);
-            if (n > 0)
-                LOG_INFO("soo: %.*s\n", (int)n, buf);
+            if (n > 0) {
+                if (zxy_should_resize_buffer(client_conn->plain_buffer_manager)) {
+                    zxy_double_buffer_size(client_conn->plain_buffer_manager);
+                }
+
+                memcpy(
+                    client_conn->plain_buffer_manager->buffer + client_conn->plain_buffer_manager->current_buffer_ptr, 
+                    buf, 
+                    n
+                );
+
+                zxy_nbyte_written_to_buffer(client_conn->plain_buffer_manager, n);
+
+
+                // LOG_INFO("soo: %.*s\n", (int)n, buf);
+            }
+
         } while (n > 0);
 
         status = get_sslstatus(client_conn->ssl, n);
@@ -287,7 +302,10 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         
     write_req->req_fd = client_conn->sock_fd;
 
-    LOG_INFO("write req: %d\n", write_req->send_nbytes);
+    LOG_INFO("write req: %d and current and max buffer size: %d %d\n", 
+        write_req->send_nbytes, 
+        client_conn->encrypt_buffer_manager->max_size_of_buffer,
+        client_conn->encrypt_buffer_manager->current_buffer_ptr);
 
     zxy_queue_unencrypted_bytes(client_conn, write_req->buffer, write_req->send_nbytes);
 
@@ -355,9 +373,9 @@ int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn)
 
             zxy_nbyte_readed_from_buffer(client_conn->encrypt_buffer_manager, n);
 
-            zxy_resize_to_prefer_buffer_size(
-                client_conn->encrypt_buffer_manager, 
-                client_conn->encrypt_buffer_manager->current_buffer_ptr);
+            // zxy_resize_to_prefer_buffer_size(
+            //     client_conn->encrypt_buffer_manager, 
+            //     client_conn->encrypt_buffer_manager->current_buffer_ptr);
 
             /* take the output of the SSL object and queue it for socket write */
             do {
@@ -397,10 +415,10 @@ zxy_write_io_req_t zxy_client_ssl_request_buffer_reader(void *ptr)
     zxy_client_ssl_conn_t *client_conn = convert_client_ssl_conn(ptr);
 
     zxy_write_io_req_t write_req;
-    write_req.buffer = client_conn->encrypt_buffer_manager->buffer;
+    write_req.buffer = client_conn->plain_buffer_manager->buffer;
     write_req.flags = 0;
-    write_req.send_nbytes = client_conn->encrypt_buffer_manager->current_buffer_ptr;
-    write_req.clear_nbytes = client_conn->encrypt_buffer_manager->current_buffer_ptr;
+    write_req.send_nbytes = client_conn->plain_buffer_manager->current_buffer_ptr;
+    write_req.clear_nbytes = client_conn->plain_buffer_manager->current_buffer_ptr;
     
     return write_req;
 }
@@ -458,6 +476,7 @@ void zxy_free_client_ssl(void *ptr)
     zxy_client_ssl_conn_t *client_conn = convert_client_ssl_conn(ptr);
 
     zxy_free_buffer_manager(client_conn->read_buffer_manager);
+    zxy_free_buffer_manager(client_conn->plain_buffer_manager);
     zxy_free_buffer_manager(client_conn->writing_buffer_manager);
     zxy_free_buffer_manager(client_conn->encrypt_buffer_manager);
 

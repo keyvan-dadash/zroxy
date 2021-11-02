@@ -34,6 +34,7 @@ zxy_client_ssl_conn_t* zxy_make_client_ssl_conn(SSL_CTX *ctx, int sock_fd)
     client_conn->encrypt_buffer_manager = zxy_malloc_buffer_manager_with_buffer_size(READ_BUF_SIZE + 1);
     client_conn->writing_buffer_manager = zxy_malloc_buffer_manager_with_buffer_size(READ_BUF_SIZE + 1);
     client_conn->read_buffer_manager = zxy_malloc_buffer_manager_with_buffer_size(READ_BUF_SIZE + 1);
+    client_conn->plain_buffer_manager = zxy_malloc_buffer_manager_with_buffer_size(READ_BUF_SIZE + 1);
     client_conn->rbio = BIO_new(BIO_s_mem());
     client_conn->wbio = BIO_new(BIO_s_mem());
     client_conn->ssl = SSL_new(ctx);

@@ -130,6 +130,12 @@ typedef struct
 
 
     /**
+     * this where other peer read unencrypt data
+     */
+    zxy_buffer_manager_t *plain_buffer_manager;
+
+
+    /**
      * should free?
      */
     int8_t set_free;

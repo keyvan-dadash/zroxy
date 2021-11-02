@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <memory.h>
 
+#include "defines.h"
+#include "logging/logs.h"
 #include "utils/io/buffer_manager.h"
 
 
@@ -25,7 +27,8 @@ zxy_buffer_manager_t* zxy_malloc_buffer_manager_with_buffer_size(int max_buffer_
 
 int zxy_double_buffer_size(zxy_buffer_manager_t* buffer_manager)
 {
-    buffer_manager->buffer = (char *)realloc(buffer_manager->buffer, ((buffer_manager->max_size_of_buffer - 1) * 2 + 1) );
+    LOG_INFO("new size will be %d\n", ((buffer_manager->max_size_of_buffer - 1) * 2));
+    buffer_manager->buffer = (char *)realloc(buffer_manager->buffer, ((buffer_manager->max_size_of_buffer - 1) * 2) );
     memset((buffer_manager->buffer + buffer_manager->max_size_of_buffer), '\0', (buffer_manager->max_size_of_buffer - 1));
     buffer_manager->max_size_of_buffer = ((buffer_manager->max_size_of_buffer - 1) * 2 + 1);
 
@@ -40,7 +43,11 @@ int zxy_resize_to_prefer_buffer_size(zxy_buffer_manager_t* buffer_manager, int32
         memset((buffer_manager->buffer + buffer_manager->max_size_of_buffer), '\0', prefer_size - buffer_manager->max_size_of_buffer);
     }
     
-    buffer_manager->max_size_of_buffer = prefer_size;
+    if (prefer_size < READ_BUF_SIZE) {
+        buffer_manager->max_size_of_buffer = READ_BUF_SIZE;
+    } else {
+        buffer_manager->max_size_of_buffer = prefer_size;
+    }
 
     return buffer_manager->max_size_of_buffer;
 }
