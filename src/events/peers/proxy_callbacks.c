@@ -14,8 +14,6 @@
 #include "utils/io/io_helper.h"
 #include "utils/timer/timers.h"
 
-
-
 zxy_backend_base_t* get_backend_base_from(void *ptr)
 {
     return ((zxy_proxy_connection_t*)((zxy_event_handler_t*)ptr)->params)->backend;
