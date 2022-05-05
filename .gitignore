@@ -17,3 +17,5 @@ cert/
 
 #configs
 config.lua
+
+.ccls
