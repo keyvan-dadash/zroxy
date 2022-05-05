@@ -51,12 +51,12 @@ int zxy_on_backend_plain_read_event(void *ptr)
     nbytes = zxy_read_socket_non_block(&read_req);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close(backend)\n");
+        LOG_WARNING("Read 0 bytes from FD(%d) and we should close this fd\n", backend_conn->sock_fd);
         return 0; //TODO: some how signal close state
     } else if (nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;
     } else if (nbytes == UNKOWN_ERROR) {
-        LOG_ERROR("fuck in recv\n");
+        LOG_ERROR("We encounter unkown error for FD(%d)\n", backend_conn->sock_fd);
         return UNKOWN_ERROR;
     }
 
@@ -74,19 +74,22 @@ int zxy_on_backend_plain_write_event(void *ptr, zxy_write_io_req_t* write_req)
         
     write_req->req_fd = backend_conn->sock_fd;
 
+    // TODO: some how it closed
+    // write_req->flags |= MSG_NOSIGNAL;
+
     nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close(backend)\n");
+        LOG_WARNING("Write 0 bytes to FD(%d) and we should close this fd\n", backend_conn->sock_fd);
         return 0;
     } else if (nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;
     } else if (nbytes == UNKOWN_ERROR) {
-        LOG_ERROR("fuck in send\n");
+        LOG_ERROR("We encounter unkown error for FD(%d)\n", backend_conn->sock_fd);
         return UNKOWN_ERROR;
     }
 
-    LOG_INFO("number of written bytes is %d(in send back)\n", nbytes);
+    LOG_INFO("Number of written bytes is %d\n", nbytes);
 
     return nbytes;
 }
@@ -96,7 +99,7 @@ int zxy_on_backend_plain_close_event(void *ptr)
     zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
 
     zxy_remove_fd_from_epoll(backend_conn->sock_fd);
-    LOG_INFO("backend fd(%d) closed the connection\n", backend_conn->sock_fd);
+    LOG_INFO("Backend FD(%d) closed the connection\n", backend_conn->sock_fd);
     backend_conn->is_closed = 1;
     close(backend_conn->sock_fd);
 
@@ -125,7 +128,7 @@ int zxy_backend_plain_force_close(void *ptr)
 
     if (backend_conn->is_closed != 1) {
         zxy_remove_fd_from_epoll(backend_conn->sock_fd);
-        LOG_INFO("backend fd(%d) closed the connection\n", backend_conn->sock_fd);
+        LOG_INFO("Backend fd(%d) closed the connection\n", backend_conn->sock_fd);
         backend_conn->is_closed = 1;
         close(backend_conn->sock_fd);
 
@@ -142,6 +145,7 @@ int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, v
         backend_conn->events = events;
     }
 
+    //TODO: we can handle better
     switch (is_ready)
     {
     case READ_EVENT: {

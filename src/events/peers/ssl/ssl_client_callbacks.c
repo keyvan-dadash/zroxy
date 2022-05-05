@@ -1,7 +1,3 @@
-
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -80,7 +76,7 @@ zxy_client_base_t* convert_client_ssl_base(void *ptr)
 
 void zxy_queue_encrypted_bytes(zxy_client_ssl_conn_t *client_conn, char *buf, size_t len)
 {
-     if (zxy_should_resize_buffer(client_conn->writing_buffer_manager)) {
+    if (zxy_should_resize_buffer(client_conn->writing_buffer_manager)) {
         zxy_double_buffer_size(client_conn->writing_buffer_manager);
     }
 
@@ -141,13 +137,13 @@ int zxy_on_client_ssl_read_event(void *ptr)
     // fflush(stdout);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close(ssl client)\n");
+        LOG_WARNING("Read 0 bytes from FD(%d) and we should close\n", client_conn->sock_fd);
         return 0; //TODO: some how signal close state
     } else if (nbytes == WOULD_BLOCK) {
-        LOG_ERROR("fuck in recv11\n");
+        LOG_ERROR("We cannot read from FD(%d) because it blocks\n", client_conn->sock_fd);
         return WOULD_BLOCK;
     } else if (nbytes == UNKOWN_ERROR) {
-        LOG_ERROR("fuck in recv\n");
+        LOG_ERROR("We encounte unkown error from FD(%d)\n", client_conn->sock_fd);
         return UNKOWN_ERROR;
     }
 
@@ -155,7 +151,7 @@ int zxy_on_client_ssl_read_event(void *ptr)
 
     zxy_nbyte_written_to_buffer(client_conn->read_buffer_manager, nbytes);
 
-    LOG_INFO("total bytes: %d\n", client_conn->read_buffer_manager->current_buffer_ptr);
+    LOG_INFO("Total bytes until know for FD(%d): %d\n", client_conn->sock_fd, client_conn->read_buffer_manager->current_buffer_ptr);
 
     int result = zxy_proccess_ssl_bytes(client_conn, read_nbytes);
 
@@ -170,7 +166,7 @@ int zxy_on_client_ssl_read_event(void *ptr)
     zxy_nbyte_readed_from_buffer(client_conn->read_buffer_manager, nbytes);
 
     if (result) {
-        LOG_ERROR("something bad happend\n");
+        LOG_ERROR("We cannot proccess ssl bytes for FD(%d)\n", client_conn->sock_fd);
     }
 
     return nbytes;
@@ -198,14 +194,14 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
         );
 
         if (n <= 0) {
-            LOG_INFO("bad bad\n");
+            LOG_INFO("BIO write error for FD(%d)\n", client_conn->sock_fd);
             return UNKOWN_ERROR;
         }
 
         base_read_ptr += n;
         number_readed_bytes -= n;
 
-        LOG_INFO("go read %d\n", n);
+        LOG_INFO("Going to read %d from FD(%d)\n", n, client_conn->sock_fd);
         
         if (!SSL_is_init_finished(client_conn->ssl)) {
             n = SSL_accept(client_conn->ssl);
@@ -218,7 +214,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
 
             status = get_sslstatus(client_conn->ssl, n);
 
-            LOG_INFO("before babababababab1111 %d\n", n);
+            LOG_INFO("Retrun from SSL_accept for FD(%d): %d\n", client_conn->sock_fd, n);
 
             if (status == SSLSTATUS_WANT_IO) {
                 do {
@@ -226,7 +222,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
                     if (n > 0)
                         zxy_queue_encrypted_bytes(client_conn, buf, n);
                     else if (!BIO_should_retry(client_conn->wbio)) {
-                        LOG_INFO("bad bad1\n");
+                        LOG_INFO("Error wbio for FD(%d)\n", client_conn->sock_fd);
                         return -1;
                     }
                 } while(n > 0);
@@ -234,17 +230,17 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
 
 
             if (status == SSLSTATUS_FAIL) {
-                LOG_INFO("bad bad2\n");
+                LOG_INFO("Unkown error for FD(%d)\n", client_conn->sock_fd);
                 return UNKOWN_ERROR;
             }
 
-            LOG_INFO("babababababab1111 %d\n", n);
+            LOG_INFO("Final bytes for FD(%d) is %d\n", client_conn->sock_fd, n);
 
             if (!SSL_is_init_finished(client_conn->ssl))
                 return 0;
         }
 
-        LOG_INFO("babababababab\n");
+        LOG_INFO("Going to SSL_read for FD(%d)\n", client_conn->sock_fd);
 
         do {
             n = SSL_read(client_conn->ssl, buf, sizeof(buf));
@@ -279,13 +275,13 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
             if (n > 0)
                 zxy_queue_encrypted_bytes(client_conn, buf, n);
             else if (!BIO_should_retry(client_conn->wbio)) {
-                LOG_INFO("bad bad3\n");
+                LOG_INFO("Error wbio for FD(%d)\n", client_conn->sock_fd);
                 return UNKOWN_ERROR;
             }
         } while (n>0);
 
         if (status == SSLSTATUS_FAIL) {
-            LOG_INFO("bad bad3\n");
+            LOG_INFO("Unkown error for FD(%d)\n", client_conn->sock_fd);
             return UNKOWN_ERROR;
         }
 
@@ -302,7 +298,8 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         
     write_req->req_fd = client_conn->sock_fd;
 
-    LOG_INFO("write req: %d and current and max buffer size: %d %d\n", 
+    LOG_INFO("Write req for FD(%d): number of bytes is %d and current and max buffer size: %d and current_buffer_ptr %d\n",
+        client_conn->sock_fd,
         write_req->send_nbytes, 
         client_conn->encrypt_buffer_manager->max_size_of_buffer,
         client_conn->encrypt_buffer_manager->current_buffer_ptr);
@@ -316,7 +313,7 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
     write_req->clear_nbytes = client_conn->writing_buffer_manager->current_buffer_ptr;
 
     if (write_req->send_nbytes <= 0) {
-        LOG_INFO("wtfff dude\n");
+        LOG_INFO("Send bytes is under zero for FD(%d)\n", client_conn->sock_fd);
         return 0;
     }
 
@@ -332,16 +329,16 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
     zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
 
     if (nbytes == 0) {
-        LOG_WARNING("we should going to close(ssl client)\n");
+        LOG_WARNING("Read 0 bytes from FD(%d) we should close the client\n", client_conn->sock_fd);
         return 0;
     } else if (nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;
     } else if (nbytes == UNKOWN_ERROR) {
-        LOG_ERROR("fuck in send\n");
+        LOG_ERROR("We encounter UNKOWN ERROR is FD(%d)\n", client_conn->sock_fd);
         return UNKOWN_ERROR;
     }
 
-    LOG_INFO("number of written bytes is %d(in ssl send client)\n", nbytes);
+    LOG_INFO("Number of written bytes in FD(%d) is %d\n", client_conn->sock_fd, nbytes);
     
     return nbytes;
 }
@@ -403,7 +400,7 @@ int zxy_on_client_ssl_close_event(void *ptr)
     zxy_client_ssl_conn_t *client_conn = convert_client_ssl_conn(ptr);
 
     zxy_remove_fd_from_epoll(client_conn->sock_fd);
-    LOG_INFO("client fd(%d) closed the connection\n", client_conn->sock_fd);
+    LOG_INFO("Client FD(%d) is going to close\n", client_conn->sock_fd);
     client_conn->is_closed = 1;
     close(client_conn->sock_fd);
 
@@ -429,7 +426,7 @@ int zxy_client_ssl_force_close(void *ptr)
 
     if (client_conn->is_closed != 1) {
         zxy_remove_fd_from_epoll(client_conn->sock_fd);
-        LOG_INFO("backend fd(%d) closed the connection\n", client_conn->sock_fd);
+        LOG_INFO("Client FD(%d) closed the connection\n", client_conn->sock_fd);
         client_conn->is_closed = 1;
         close(client_conn->sock_fd);
 

@@ -111,7 +111,7 @@ void zxy_handle_client_events(
         if (read_bytes > 0 && backend_base->is_ready_event(-1, WRITE_EVENT, backend_base)) {
             zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);
 
-            LOG_INFO("number of requested write: %d\n", write_req.send_nbytes);
+            LOG_INFO("Client is ready for write to backend buffer. number of bytes: %d\n", write_req.send_nbytes);
 
             backend_base->on_write((void*)backend_base, &write_req);
         }
@@ -142,6 +142,7 @@ void zxy_handle_backend_events(
     if (backend_base->is_ready_event(events, CLOSE_EVENT, backend_base)) {
         backend_base->on_close(backend_base);
         // backend_base->free_params(backend_base);
+        LOG_INFO("Backend should be close by now\n");
         return;
     }
 
@@ -164,7 +165,7 @@ void zxy_handle_backend_events(
     if (backend_base->is_ready_event(events, WRITE_EVENT, backend_base)) {
         zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);
 
-        LOG_INFO("hoho:%d %s\n", write_req.send_nbytes, write_req.buffer);
+        LOG_INFO("Backend is ready to write:%d %s\n", write_req.send_nbytes, write_req.buffer);
         if (write_req.send_nbytes > 0)
             backend_base->on_write((void*)backend_base, &write_req);
 

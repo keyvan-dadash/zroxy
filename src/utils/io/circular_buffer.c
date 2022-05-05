@@ -20,7 +20,7 @@ void zxy_advance_pointer(zxy_circular_buffer_t *buffer)
     }
 
     if (++(buffer->head) == buffer->maximum_size_of_buffer) {
-        buffer->head == 0;
+        buffer->head = 0;
     }
 
     buffer->is_full = buffer->tail == buffer->head ? 1 : 0;
@@ -28,7 +28,7 @@ void zxy_advance_pointer(zxy_circular_buffer_t *buffer)
 
 void zxy_retreat_pointer(zxy_circular_buffer_t *buffer)
 {
-    buffer->is_full == 0;
+    buffer->is_full = 0;
     if (++(buffer->tail) == buffer->maximum_size_of_buffer) {
         buffer->tail = 0;
     }
@@ -101,6 +101,8 @@ int32_t zxy_write_buffer_to_circular_buffer(zxy_circular_buffer_t *circular_buff
         circular_buff->buf[circular_buff->head] = buf[i];
         zxy_advance_pointer(circular_buff);
     }
+    
+    return len;
 }
 
 int8_t zxy_get_buffer_from_circulat_buffer(zxy_circular_buffer_t *circular_buff, char *data, size_t len)
@@ -109,6 +111,8 @@ int8_t zxy_get_buffer_from_circulat_buffer(zxy_circular_buffer_t *circular_buff,
         data[i] = circular_buff->buf[circular_buff->tail];
         zxy_retreat_pointer(circular_buff);
     }
+
+    return len;
 }
 
 int8_t zxy_is_circular_buffer_empty(zxy_circular_buffer_t *circular_buff)

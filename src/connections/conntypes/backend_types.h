@@ -10,7 +10,6 @@
 #include "utils/io/io_helper.h"
 
 
-
 typedef int (*zxy_backend_read_callback_func)(void*);
 
 typedef int (*zxy_backend_write_callback_func)(void*, zxy_write_io_req_t*);
