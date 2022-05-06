@@ -40,7 +40,7 @@ static enum sslstatus get_sslstatus(SSL* ssl, int n)
     case SSL_ERROR_ZERO_RETURN:
     case SSL_ERROR_SYSCALL:
     default:
-      LOG_INFO("%s\n", ERR_error_string(ERR_get_error(), NULL));
+      LOG_ERROR("%s\n", ERR_error_string(ERR_get_error(), NULL));
       return SSLSTATUS_FAIL;
   }
 }
@@ -194,7 +194,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
         );
 
         if (n <= 0) {
-            LOG_INFO("BIO write error for FD(%d)\n", client_conn->sock_fd);
+            LOG_ERROR("BIO write error for FD(%d)\n", client_conn->sock_fd);
             return UNKOWN_ERROR;
         }
 
@@ -208,7 +208,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
 
             if (n < 0) {
                 int error = SSL_get_error(client_conn->ssl, n);
-                LOG_INFO("%d %s\n", error, ERR_error_string(ERR_get_error(), NULL));
+                LOG_ERROR("%d %s\n", error, ERR_error_string(ERR_get_error(), NULL));
             }
 
 
@@ -222,7 +222,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
                     if (n > 0)
                         zxy_queue_encrypted_bytes(client_conn, buf, n);
                     else if (!BIO_should_retry(client_conn->wbio)) {
-                        LOG_INFO("Error wbio for FD(%d)\n", client_conn->sock_fd);
+                        LOG_ERROR("Error wbio for FD(%d)\n", client_conn->sock_fd);
                         return -1;
                     }
                 } while(n > 0);
@@ -230,7 +230,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
 
 
             if (status == SSLSTATUS_FAIL) {
-                LOG_INFO("Unkown error for FD(%d)\n", client_conn->sock_fd);
+                LOG_ERROR("Unkown error for FD(%d)\n", client_conn->sock_fd);
                 return UNKOWN_ERROR;
             }
 
@@ -275,13 +275,13 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
             if (n > 0)
                 zxy_queue_encrypted_bytes(client_conn, buf, n);
             else if (!BIO_should_retry(client_conn->wbio)) {
-                LOG_INFO("Error wbio for FD(%d)\n", client_conn->sock_fd);
+                LOG_ERROR("Error wbio for FD(%d)\n", client_conn->sock_fd);
                 return UNKOWN_ERROR;
             }
         } while (n>0);
 
         if (status == SSLSTATUS_FAIL) {
-            LOG_INFO("Unkown error for FD(%d)\n", client_conn->sock_fd);
+            LOG_ERROR("Unkown error for FD(%d)\n", client_conn->sock_fd);
             return UNKOWN_ERROR;
         }
 

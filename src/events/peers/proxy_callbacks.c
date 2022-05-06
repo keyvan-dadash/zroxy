@@ -142,7 +142,7 @@ void zxy_handle_backend_events(
     if (backend_base->is_ready_event(events, CLOSE_EVENT, backend_base)) {
         backend_base->on_close(backend_base);
         // backend_base->free_params(backend_base);
-        LOG_INFO("Backend should be close by now\n");
+        LOG_WARNING("Backend should be close by now\n");
         return;
     }
 
