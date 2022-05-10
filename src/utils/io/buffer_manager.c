@@ -1,6 +1,3 @@
-
-
-
 #include <stdlib.h>
 #include <sys/types.h>
 #include <memory.h>
@@ -8,8 +5,6 @@
 #include "defines.h"
 #include "logging/logs.h"
 #include "utils/io/buffer_manager.h"
-
-
 
 zxy_buffer_manager_t* zxy_malloc_buffer_manager_with_buffer_size(int max_buffer_size)
 {
@@ -20,7 +15,6 @@ zxy_buffer_manager_t* zxy_malloc_buffer_manager_with_buffer_size(int max_buffer_
 
     buffer_manager->max_size_of_buffer = max_buffer_size;
     buffer_manager->current_buffer_ptr = 0;
-    buffer_manager->tail = 0;
 
     return buffer_manager;
 }
@@ -57,7 +51,17 @@ int zxy_should_resize_buffer(zxy_buffer_manager_t* buffer_manager)
 {
     return buffer_manager->buffer[buffer_manager->max_size_of_buffer - 1] != '\0';
 }
+/*
+int zxy_get_base_of_buffer(zxy_buffer_manager_t* buffer_manager)
+{
+  return buffer_manager->base_ptr;
+}
 
+int zxy_get_tail_of_buffer(zxy_buffer_manager_t* buffer_manager)
+{
+  return buffer_manager->tail_ptr;
+}
+*/
 void zxy_free_buffer_manager(zxy_buffer_manager_t* buffer_manager)
 {
     free(buffer_manager->buffer);

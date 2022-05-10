@@ -1,6 +1,3 @@
-
-
-
 #include <stdlib.h>
 
 #include "defines.h"
@@ -113,7 +110,9 @@ void zxy_handle_client_events(
 
             LOG_INFO("Client is ready for write to backend buffer. number of bytes: %d\n", write_req.send_nbytes);
 
-            backend_base->on_write((void*)backend_base, &write_req);
+            int nbytes = backend_base->on_write((void*)backend_base, &write_req);
+
+            client_base->read_nbytes(client_base, nbytes);
         }
     }
 
@@ -122,6 +121,7 @@ void zxy_handle_client_events(
 
         // LOG_INFO("write\n");
         // if (write_req.send_nbytes > 0)
+        // This is problem due to ssl handshake
             client_base->on_write((void*)client_base, &write_req);
         
         zxy_check_backend_close(
@@ -158,7 +158,9 @@ void zxy_handle_backend_events(
         if (read_bytes > 0 && client_base->is_ready_event(-1, WRITE_EVENT, client_base)) {
             zxy_write_io_req_t write_req = backend_base->request_buffer_reader(backend_base);
 
-            client_base->on_write((void*)client_base, &write_req);
+            int nbytes = client_base->on_write((void*)client_base, &write_req);
+
+            backend_base->read_nbytes(backend_base, nbytes);
         }
     }
 

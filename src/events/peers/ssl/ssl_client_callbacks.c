@@ -18,7 +18,6 @@
 #include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
 
-
 int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed_bytes);
 
 int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn);
@@ -294,6 +293,7 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
 {
     zxy_client_ssl_conn_t *client_conn = convert_client_ssl_conn(ptr);
 
+    int ssl_nbytes;
     int nbytes;
         
     write_req->req_fd = client_conn->sock_fd;
@@ -305,7 +305,8 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         client_conn->encrypt_buffer_manager->current_buffer_ptr);
 
     zxy_queue_unencrypted_bytes(client_conn, write_req->buffer, write_req->send_nbytes);
-
+    nbytes = write_req->send_nbytes;
+    
     zxy_encrypt_io_req(client_conn);
 
     write_req->buffer = client_conn->writing_buffer_manager->buffer;
@@ -317,23 +318,23 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         return 0;
     }
 
-    nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
+    ssl_nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
     // client_conn->writing_buffer_manager->current_buffer_ptr = 0;
 
     memmove(
         client_conn->writing_buffer_manager->buffer, 
-        client_conn->writing_buffer_manager->buffer + nbytes, 
-        client_conn->writing_buffer_manager->current_buffer_ptr - nbytes
+        client_conn->writing_buffer_manager->buffer + ssl_nbytes, 
+        client_conn->writing_buffer_manager->current_buffer_ptr - ssl_nbytes
     );
-    zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, nbytes);
+    zxy_nbyte_readed_from_buffer(client_conn->writing_buffer_manager, ssl_nbytes);
 
-    if (nbytes == 0) {
+    if (ssl_nbytes == 0) {
         LOG_WARNING("Read 0 bytes from FD(%d) we should close the client\n", client_conn->sock_fd);
         return 0;
-    } else if (nbytes == WOULD_BLOCK) {
+    } else if (ssl_nbytes == WOULD_BLOCK) {
         return WOULD_BLOCK;
-    } else if (nbytes == UNKOWN_ERROR) {
+    } else if (ssl_nbytes == UNKOWN_ERROR) {
         LOG_ERROR("We encounter UNKOWN ERROR is FD(%d)\n", client_conn->sock_fd);
         return UNKOWN_ERROR;
     }
@@ -418,6 +419,23 @@ zxy_write_io_req_t zxy_client_ssl_request_buffer_reader(void *ptr)
     write_req.clear_nbytes = client_conn->plain_buffer_manager->current_buffer_ptr;
     
     return write_req;
+}
+
+int zxy_client_read_nbytes_from_buffer(void *ptr, int nbytes)
+{
+  if (nbytes <= 0)
+    return -1;
+  
+  zxy_client_ssl_conn_t *client_conn = convert_client_ssl_conn(ptr);
+  
+  memmove(
+    client_conn->plain_buffer_manager->buffer, 
+    client_conn->plain_buffer_manager->buffer + nbytes, 
+    client_conn->plain_buffer_manager->current_buffer_ptr - nbytes
+  );
+  zxy_nbyte_readed_from_buffer(client_conn->plain_buffer_manager, nbytes);
+
+  return 0;
 }
 
 int zxy_client_ssl_force_close(void *ptr)

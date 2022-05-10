@@ -61,7 +61,8 @@ int zxy_write_socket_non_block_and_clear_buf(zxy_write_io_req_t *io_req)
         return UNKOWN_ERROR;
     }
 
-    memset(io_req->buffer, '\0', io_req->clear_nbytes);
+    nbytes = nbytes > io_req->clear_nbytes ? io_req->clear_nbytes : nbytes;
+    memset(io_req->buffer, '\0', nbytes);
 
     return nbytes;
 }

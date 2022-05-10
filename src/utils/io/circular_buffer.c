@@ -1,5 +1,3 @@
-
-
 #include <stdlib.h>
 #include <memory.h>
 
@@ -83,7 +81,6 @@ int8_t zxy_clear_circular_buffer(zxy_circular_buffer_t *circular_buff)
     circular_buff->tail = 0;
     circular_buff->is_full = 0;
 
-
     return 1;
 }
 
@@ -105,7 +102,7 @@ int32_t zxy_write_buffer_to_circular_buffer(zxy_circular_buffer_t *circular_buff
     return len;
 }
 
-int8_t zxy_get_buffer_from_circulat_buffer(zxy_circular_buffer_t *circular_buff, char *data, size_t len)
+int8_t zxy_get_buffer_from_circular_buffer(zxy_circular_buffer_t *circular_buff, char *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
         data[i] = circular_buff->buf[circular_buff->tail];

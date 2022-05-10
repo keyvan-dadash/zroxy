@@ -1,7 +1,3 @@
-
-
-
-
 #include <stdlib.h>
 #include <sys/types.h>
 #include <memory.h>
@@ -49,4 +45,5 @@ void zxy_set_up_backend_plain_base_callbacks(zxy_backend_base_t* backend_base)
     backend_base->on_read = zxy_on_backend_plain_read_event;
     backend_base->on_write = zxy_on_backend_plain_write_event;
     backend_base->request_buffer_reader = zxy_backend_plain_request_buffer_reader;
+    backend_base->read_nbytes = zxy_backend_read_nbytes_from_buffer;
 }

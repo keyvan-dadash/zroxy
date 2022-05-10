@@ -1,10 +1,7 @@
-
-
 #ifndef CIRCULAR_BUFFER_H
 #define CIRCULAR_BUFFER_H
 
 #include <sys/types.h>
-
 
 /* similar to this link
 https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and-c/
@@ -39,7 +36,7 @@ int8_t zxy_free_circular_buffer(zxy_circular_buffer_t *circular_buff);
 
 int32_t zxy_write_buffer_to_circular_buffer(zxy_circular_buffer_t *circular_buff, char *buf, size_t len);
 
-int8_t zxy_get_buffer_from_circulat_buffer(zxy_circular_buffer_t *circular_buff, char *data, size_t len);
+int8_t zxy_get_buffer_from_circular_buffer(zxy_circular_buffer_t *circular_buff, char *data, size_t len);
 
 int8_t zxy_is_circular_buffer_empty(zxy_circular_buffer_t *circular_buff);
 

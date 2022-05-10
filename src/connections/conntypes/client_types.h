@@ -1,6 +1,3 @@
-
-
-
 #ifndef CLIENT_TYPES_H
 #define CLIENT_TYPES_H
 
@@ -19,6 +16,8 @@ typedef int (*zxy_client_write_callback_func)(void*, zxy_write_io_req_t*);
 typedef int (*zxy_client_close_callback_func)(void*);
 
 typedef zxy_write_io_req_t (*zxy_client_request_buffer_reader)(void*);
+
+typedef int (*zxy_client_read_nbytes_from_buffer_func)(void*, int32_t);
 
 typedef void (*zxy_client_event_callback)(int32_t, u_int32_t, void*);
 
@@ -43,6 +42,7 @@ typedef struct
      * client extra function for controll object
      */
     zxy_client_request_buffer_reader request_buffer_reader;
+    zxy_client_read_nbytes_from_buffer_func read_nbytes;
     zxy_client_close_callback_func force_close;
     zxy_client_memebr_func is_ready_event;
     zxy_client_free_params free_params;
@@ -141,7 +141,5 @@ typedef struct
     int8_t set_free;
 
 } zxy_client_ssl_conn_t;
-
-
 
 #endif /* CLIENT_TYPES_H */

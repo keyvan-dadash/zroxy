@@ -54,4 +54,5 @@ void zxy_set_up_client_ssl_base_callbacks(zxy_client_base_t* client_base)
     client_base->on_read = zxy_on_client_ssl_read_event;
     client_base->on_write = zxy_on_client_ssl_write_event;
     client_base->request_buffer_reader = zxy_client_ssl_request_buffer_reader;
+    client_base->read_nbytes = zxy_client_read_nbytes_from_buffer;
 }

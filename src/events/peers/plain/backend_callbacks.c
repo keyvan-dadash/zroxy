@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -120,6 +117,24 @@ zxy_write_io_req_t zxy_backend_plain_request_buffer_reader(void *ptr)
     return write_req;
 }
 
+int zxy_backend_read_nbytes_from_buffer(void *ptr, int nbytes)
+{
+  if (nbytes <= 0)
+    return -1;
+
+  zxy_backend_conn_t *backend_conn = convert_backend_conn(ptr);
+ 
+  LOG_INFO("Current ptr is: %d", backend_conn->buffer_manager->current_buffer_ptr);
+  fflush(stdout);
+  memmove(
+    backend_conn->buffer_manager->buffer, 
+    backend_conn->buffer_manager->buffer + nbytes, 
+    backend_conn->buffer_manager->current_buffer_ptr - nbytes
+  );
+  zxy_nbyte_readed_from_buffer(backend_conn->buffer_manager, nbytes);
+
+  return 0;
+}
 
 //TODO: change logic of force close
 int zxy_backend_plain_force_close(void *ptr)

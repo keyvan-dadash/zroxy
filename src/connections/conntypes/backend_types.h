@@ -18,6 +18,8 @@ typedef int (*zxy_backend_close_callback_func)(void*);
 
 typedef zxy_write_io_req_t (*zxy_backend_request_buffer_reader)(void*);
 
+typedef int (*zxy_backend_read_nbytes_from_buffer_func)(void*, int32_t);
+
 typedef void (*zxy_backend_event_callback)(int32_t, u_int32_t, void*);
 
 typedef int  (*zxy_backend_memebr_func)(u_int32_t, u_int32_t, void*);
@@ -40,6 +42,7 @@ typedef struct
      * backend extra function for controll object
      */
     zxy_backend_request_buffer_reader request_buffer_reader;
+    zxy_backend_read_nbytes_from_buffer_func read_nbytes;
     zxy_backend_close_callback_func force_close;
     zxy_backend_memebr_func is_ready_event;
     zxy_backend_free_params free_params;
