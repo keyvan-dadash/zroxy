@@ -1,5 +1,3 @@
-
-
 #include <openssl/ssl.h>
 
 #ifndef DEFINES_H
@@ -27,3 +25,4 @@ SSL_CTX *ctx;
 #define FREED_SOCK 104
 
 #endif /* DEFINES_H */
+

@@ -1,13 +1,9 @@
-
-
 #ifndef EPOLL_MANAGER_H
 #define EPOLL_MANAGER_H
 
 #include <sys/epoll.h>
 
 extern int epoll_fd;
-
-
 
 typedef void (*zxy_event_loop_handler_func) (void*, int, uint32_t);
 
@@ -21,8 +17,6 @@ typedef struct
     void *params;
     zxy_handler_free_params_func free_params;
 } zxy_event_handler_t;
-
-
 
 typedef struct zxy_linklist_of_free_obj
 {
@@ -43,3 +37,4 @@ void zxy_remove_fd_from_epoll(int sock_fd);
 void zxy_event_loop();
 
 #endif /* EPOLL_MANAGER_H */
+

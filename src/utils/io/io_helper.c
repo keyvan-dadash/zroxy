@@ -1,5 +1,3 @@
-
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -9,7 +7,6 @@
 
 #include "utils/io/io_helper.h"
 #include "logging/logs.h"
-
 
 int zxy_read_socket_non_block(zxy_read_io_req_t *io_req)
 {

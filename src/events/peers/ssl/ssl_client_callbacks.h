@@ -1,10 +1,5 @@
-
-
-
-
 #ifndef SSL_CLIENT_CALLBACK
 #define SSL_CLIENT_CALLBACK
-
 
 #include "events/io/epoll_manager.h"
 #include "utils/io/io_helper.h"
@@ -25,5 +20,5 @@ int zxy_client_ssl_is_ready_for_event(u_int32_t events, u_int32_t is_ready, void
 
 void zxy_free_client_ssl(void *ptr);
 
-
 #endif /* SSL_CLIENT_CALLBACK */
+

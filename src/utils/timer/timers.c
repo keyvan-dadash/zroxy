@@ -1,6 +1,3 @@
-
-
-
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -8,7 +5,6 @@
 #include <sys/timerfd.h>
 #include <errno.h>
 #include <time.h>
-
 
 #include "utils/timer/timers.h"
 #include "logging/logs.h"
@@ -66,5 +62,4 @@ void zxy_set_timer_time_with(int32_t timerfd, int32_t seconds, int32_t nanosecon
         LOG_FATAL(-1, "Cannot set time on timerfd error: %s", strerror(errno));
     }
 }
-
 

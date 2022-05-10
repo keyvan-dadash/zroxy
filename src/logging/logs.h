@@ -1,6 +1,3 @@
-
-
-
 #ifndef LOGS_H
 #define LOGS_H
 
@@ -9,13 +6,11 @@
 
 #define MINIMUM_LOG_LEVEL 6
 
-
 #define FATAL_ERROR_LOG_LEVEL 1
 #define ERROR_LOG_LEVEL       2
 #define WARNING_LOG_LEVEL     3
 #define INFO_LOG_LEVEL        4
 #define VERBOSE_LOG_LEVEL     5
-
 
 //FATAL
 #if FATAL_ERROR_LOG_LEVEL < MINIMUM_LOG_LEVEL
@@ -68,6 +63,5 @@
 #define LOG_VERBOSE(fmt, ...) {}
 #endif
 
-
-
 #endif /* LOGS_H */
+

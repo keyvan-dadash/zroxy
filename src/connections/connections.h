@@ -1,5 +1,3 @@
-
-
 #ifndef CONNECTIONS_H
 #define CONNECTIONS_H
 
@@ -21,3 +19,4 @@ zxy_client_base_t* zxy_make_client_conn_with_type(int32_t, enum zxy_conn_type);
 zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t, enum zxy_conn_type);
 
 #endif /* CONNECTIONS_H */
+

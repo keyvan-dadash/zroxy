@@ -10,7 +10,6 @@
 #include <openssl/err.h>
 
 #include "defines.h"
-
 #include "connections/conntypes/client_types.h"
 #include "events/peers/ssl/ssl_client_callbacks.h"
 #include "logging/logs.h"
@@ -320,8 +319,6 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
 
     ssl_nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
-    // client_conn->writing_buffer_manager->current_buffer_ptr = 0;
-
     memmove(
         client_conn->writing_buffer_manager->buffer, 
         client_conn->writing_buffer_manager->buffer + ssl_nbytes, 
@@ -501,3 +498,4 @@ void zxy_free_client_ssl(void *ptr)
 
     client_base->set_free = 1;
 }
+

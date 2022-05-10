@@ -1,9 +1,5 @@
-
-
-
 #ifndef BACKEND_CALLBACKS_H
 #define BACKEND_CALLBACKS_H
-
 
 #include "events/io/epoll_manager.h"
 #include "utils/io/io_helper.h"
@@ -25,3 +21,4 @@ int zxy_backend_plain_is_ready_for_event(u_int32_t events, u_int32_t is_ready, v
 void zxy_free_backend_plain(void *ptr);
 
 #endif /* BACKEND_CALLBACKS_H */
+

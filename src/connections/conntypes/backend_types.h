@@ -1,6 +1,3 @@
-
-
-
 #ifndef BACKEND_TYPES_H
 #define BACKEND_TYPES_H
 
@@ -8,7 +5,6 @@
 
 #include "utils/io/buffer_manager.h"
 #include "utils/io/io_helper.h"
-
 
 typedef int (*zxy_backend_read_callback_func)(void*);
 
@@ -59,7 +55,6 @@ typedef struct
     int8_t set_free;
 } zxy_backend_base_t;
 
-
 /**
  * backend plain connection
  */
@@ -84,5 +79,5 @@ typedef struct
 
 } zxy_backend_conn_t;
 
-
 #endif /* BACKEND_TYPES_H */
+

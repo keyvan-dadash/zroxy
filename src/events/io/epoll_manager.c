@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +11,6 @@
 #include "defines.h"
 #include "logging/logs.h"
 #include "events/io/epoll_manager.h"
-
 
 int epoll_fd = -1;
 
@@ -101,3 +97,4 @@ void zxy_event_loop(int server_fd)
         }
     }
 }
+

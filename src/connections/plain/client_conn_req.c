@@ -1,9 +1,6 @@
-
-
 #include <stdlib.h>
 #include <sys/types.h>
 #include <memory.h>
-
 
 #include "defines.h"
 
@@ -14,9 +11,6 @@
 
 #include "utils/io/buffer_manager.h"
 
-
-
-
 zxy_client_base_t* zxy_make_plain_client_base_conn(void *params)
 {
     zxy_client_base_t *client_base_conn = (zxy_client_base_t*)calloc(1, sizeof(zxy_client_base_t));
@@ -26,8 +20,6 @@ zxy_client_base_t* zxy_make_plain_client_base_conn(void *params)
 
     return client_base_conn;
 }
-
-
 
 zxy_client_conn_t* zxy_make_client_plain_conn(int sock_fd)
 {
@@ -51,3 +43,4 @@ void zxy_set_up_client_plain_base_callbacks(zxy_client_base_t* client_base)
     client_base->on_write = zxy_on_client_plain_write_event;
     client_base->request_buffer_reader = zxy_client_plain_request_buffer_reader;
 }
+

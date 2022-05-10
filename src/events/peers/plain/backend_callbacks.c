@@ -15,7 +15,6 @@
 #include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
 
-
 zxy_backend_conn_t* convert_backend_conn(void *ptr)
 {
     return (zxy_backend_conn_t*)(((zxy_backend_base_t*)ptr)->params);
@@ -195,3 +194,4 @@ void zxy_free_backend_plain(void *ptr)
 
     backend_base->set_free = 1;
 }
+

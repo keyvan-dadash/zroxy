@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +16,6 @@
 
 void zxy_handle_client_connection(int client_sock, char *backend_host, char *backend_port)
 {
-
     struct addrinfo hints;
     struct addrinfo *addrs;
     struct addrinfo *addrs_iter;
@@ -84,3 +80,4 @@ void zxy_handle_client_connection(int client_sock, char *backend_host, char *bac
     proxy_obj->timer_handler_ptr = timer_handler;
     zxy_add_handler_to_epoll(timer_handler, EPOLLIN | EPOLLHUP | EPOLLERR);
 }
+

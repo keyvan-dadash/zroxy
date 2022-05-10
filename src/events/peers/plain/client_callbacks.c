@@ -1,7 +1,3 @@
-
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -175,3 +171,4 @@ void zxy_free_client_plain(void *ptr)
 
     client_base->set_free = 1;
 }
+

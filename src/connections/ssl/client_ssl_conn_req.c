@@ -1,6 +1,3 @@
-
-
-
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -12,7 +9,6 @@
 #include "connections/ssl/client_ssl_conn_req.h"
 #include "events/peers/ssl/ssl_client_callbacks.h"
 
-
 zxy_client_base_t* zxy_make_ssl_client_base_conn(void *params)
 {
     zxy_client_base_t *client_base_conn = (zxy_client_base_t*)calloc(1, sizeof(zxy_client_base_t));
@@ -22,7 +18,6 @@ zxy_client_base_t* zxy_make_ssl_client_base_conn(void *params)
 
     return client_base_conn;
 }
-
 
 zxy_client_ssl_conn_t* zxy_make_client_ssl_conn(SSL_CTX *ctx, int sock_fd)
 {
@@ -56,3 +51,4 @@ void zxy_set_up_client_ssl_base_callbacks(zxy_client_base_t* client_base)
     client_base->request_buffer_reader = zxy_client_ssl_request_buffer_reader;
     client_base->read_nbytes = zxy_client_read_nbytes_from_buffer;
 }
+

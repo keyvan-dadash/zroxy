@@ -37,7 +37,6 @@ typedef struct
     zxy_client_write_callback_func on_write;
     zxy_client_close_callback_func on_close;
 
-
     /**
      * client extra function for controll object
      */
@@ -58,7 +57,6 @@ typedef struct
      */
     int8_t set_free;
 } zxy_client_base_t;
-
 
 /**
  * client plain connection
@@ -84,8 +82,6 @@ typedef struct
 
 } zxy_client_conn_t;
 
-
-
 /**
  * client ssl connection
  */
@@ -103,37 +99,31 @@ typedef struct
      */
     SSL *ssl;
 
-
     /**
      * BIO objects for reading and writing non block
      */
     BIO *rbio;
     BIO *wbio;
 
-
     /**
      * encrypt buffer manager which is controll data which is should go through ssl for encryption
      */
     zxy_buffer_manager_t *encrypt_buffer_manager;
-
 
     /**
      * buffer which is should write to sockets
      */
     zxy_buffer_manager_t *writing_buffer_manager;
 
-
     /**
      * buffer which is should read
      */
     zxy_buffer_manager_t *read_buffer_manager;
 
-
     /**
      * this where other peer read unencrypt data
      */
     zxy_buffer_manager_t *plain_buffer_manager;
-
 
     /**
      * should free?
@@ -143,3 +133,4 @@ typedef struct
 } zxy_client_ssl_conn_t;
 
 #endif /* CLIENT_TYPES_H */
+

@@ -3,9 +3,7 @@
 
 #include <sys/types.h>
 
-
 #include "utils/io/circular_buffer.h"
-
 
 void zxy_advance_pointer(zxy_circular_buffer_t *buffer)
 {
@@ -130,3 +128,4 @@ int32_t zxy_current_circular_buffer_size(zxy_circular_buffer_t *circular_buff)
 
     return size;
 }
+

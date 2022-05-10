@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,3 +76,4 @@ void zxy_start_server(int listen_fd, zxy_backend_addrs_t *addrs)
 
     zxy_event_loop();
 }
+

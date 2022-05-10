@@ -1,7 +1,3 @@
-
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,7 +9,6 @@
 #include "defines.h"
 #include "utils/ssl/ssl_helper.h"
 #include "logging/logs.h"
-
 
 SSL_CTX* ssl_init()
 {
@@ -69,3 +64,4 @@ int ssl_load_certificates_and_private_keys(SSL_CTX *ctx, char *certificate_locat
 
     return 0;
 }
+

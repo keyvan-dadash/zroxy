@@ -1,7 +1,3 @@
-
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,15 +9,11 @@
 #include "logging/logs.h"
 #include "defines.h"
 #include "connections/connections.h"
-
 #include "connections/plain/backend_conn_req.h"
 #include "connections/plain/client_conn_req.h"
-
 #include "connections/ssl/client_ssl_conn_req.h"
-
 #include "connections/conntypes/proxy_types.h"
 #include "events/peers/proxy_callbacks.h"
-
 
 zxy_event_handler_t* make_proxy_event_handler(zxy_proxy_connection_t* proxy_obj, int sock, int8_t sock_type)
 {
@@ -103,3 +95,4 @@ zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy
 
     return backend_base;
 }
+

@@ -1,6 +1,3 @@
-
-
-
 #ifndef PROXY_TYPES_H
 #define PROXY_TYPES_H
 
@@ -11,13 +8,11 @@
 
 typedef void (*proxy_callback_func)(void*);
 
-
 enum zxy_conn_type
 {
     PLAIN_CONN,
     SSL_CONN
 };
-
 
 typedef struct 
 {
@@ -35,6 +30,5 @@ typedef struct
      */
     int refrence_counter;
 } zxy_proxy_connection_t;
-
 
 #endif /* PROXY_TYPES_H */

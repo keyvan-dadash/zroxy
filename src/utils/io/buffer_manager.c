@@ -88,3 +88,4 @@ void zxy_clean_nbytes_from_buffer(zxy_buffer_manager_t* buffer_manager, int32_t 
 {
     memset(buffer_manager->buffer, '\0', nbytes);
 }
+

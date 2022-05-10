@@ -2,7 +2,6 @@
 #include <sys/types.h>
 #include <memory.h>
 
-
 #include "defines.h"
 
 #include "connections//plain/backend_conn_req.h"
@@ -11,7 +10,6 @@
 #include "events/peers/plain/backend_callbacks.h"
 
 #include "utils/io/buffer_manager.h"
-
 
 zxy_backend_base_t* zxy_make_plain_backend_base_conn(void *params)
 {
@@ -22,7 +20,6 @@ zxy_backend_base_t* zxy_make_plain_backend_base_conn(void *params)
 
     return backend_base_conn;
 }
-
 
 zxy_backend_conn_t* zxy_make_backend_plain_conn(int sock_fd)
 {
@@ -47,3 +44,4 @@ void zxy_set_up_backend_plain_base_callbacks(zxy_backend_base_t* backend_base)
     backend_base->request_buffer_reader = zxy_backend_plain_request_buffer_reader;
     backend_base->read_nbytes = zxy_backend_read_nbytes_from_buffer;
 }
+

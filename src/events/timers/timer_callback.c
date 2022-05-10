@@ -1,5 +1,3 @@
-
-
 #include <sys/types.h>
 #include <stdlib.h>
 
@@ -26,14 +24,13 @@ void zxy_free_timer_handler(zxy_event_handler_t *timer_handler)
     zxy_add_block_to_link_list(timer_handler);
 }
 
-
 void zxy_on_timer_event_callback(int32_t fd, uint32_t event, void *ptr)
 {
     
 }
 
-
 void zxy_free_timer_params(void *ptr)
 {
     LOG_INFO("free timer\n");
 }
+

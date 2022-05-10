@@ -17,7 +17,6 @@ typedef struct
     int32_t tail_ptr;
 } zxy_buffer_manager_t;
 
-
 zxy_buffer_manager_t* zxy_malloc_buffer_manager_with_buffer_size(int max_buffer_size);
 
 int zxy_double_buffer_size(zxy_buffer_manager_t*);
@@ -41,3 +40,4 @@ void zxy_nbyte_readed_from_buffer(zxy_buffer_manager_t*, int32_t);
 void zxy_clean_nbytes_from_buffer(zxy_buffer_manager_t*, int32_t);
 
 #endif /* BUFFER_MANAGER_H */
+

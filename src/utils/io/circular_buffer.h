@@ -9,7 +9,6 @@ https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and
 
 typedef struct
 {
-    
     char *buf;
 
     /**
@@ -23,10 +22,7 @@ typedef struct
      * extra info
      */
     int8_t is_full;
-
-
 } zxy_circular_buffer_t;
-
 
 zxy_circular_buffer_t *zxy_create_circular_buffer(int32_t size_of_buffer);
 
@@ -41,7 +37,5 @@ int8_t zxy_get_buffer_from_circular_buffer(zxy_circular_buffer_t *circular_buff,
 int8_t zxy_is_circular_buffer_empty(zxy_circular_buffer_t *circular_buff);
 
 int32_t zxy_current_circular_buffer_size(zxy_circular_buffer_t *circular_buff);
-
-
 
 #endif /* CIRCULAR_BUFFER_H */

@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +15,6 @@
 #include "server/server.h"
 #include "conf/configure.h"
 #include "utils/ssl/ssl_helper.h"
-
 
 int main(int argc, char *argv[])
 {
@@ -103,3 +101,4 @@ int main(int argc, char *argv[])
 
     zxy_start_server(server_sock, &backend_addrs);
 }
+
