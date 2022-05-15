@@ -60,7 +60,7 @@ void zxy_handle_client_connection(int client_sock, char *backend_host, char *bac
 
     //now we have both client and backend sockets in non block mode
 
-    zxy_proxy_connection_t *proxy_obj = zxy_make_proxy_connection(client_sock, SSL_CONN, backend_socket_fd, PLAIN_CONN);
+    zxy_proxy_connection_t *proxy_obj = zxy_make_proxy_connection(client_sock, SSL_CONN, backend_socket_fd, SSL_CONN);
     
     //create and register client
     zxy_event_handler_t *client_handler = make_proxy_event_handler(proxy_obj, client_sock, CLIENT_SOCK);

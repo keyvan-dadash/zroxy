@@ -12,6 +12,7 @@
 #include "connections/plain/backend_conn_req.h"
 #include "connections/plain/client_conn_req.h"
 #include "connections/ssl/client_ssl_conn_req.h"
+#include "connections/ssl/backend_ssl_conn_req.h"
 #include "connections/conntypes/proxy_types.h"
 #include "events/peers/proxy_callbacks.h"
 
@@ -59,7 +60,6 @@ zxy_client_base_t* zxy_make_client_conn_with_type(int32_t client_fd, enum zxy_co
     }
 
     case SSL_CONN: {
-        LOG_INFO("wtfffff\n");
         zxy_client_ssl_conn_t *client_ssl_conn = zxy_make_client_ssl_conn(ctx, client_fd);
         client_base = zxy_make_ssl_client_base_conn((void*)client_ssl_conn);
         zxy_set_up_client_ssl_base_callbacks(client_base);
@@ -85,7 +85,9 @@ zxy_backend_base_t* zxy_make_backend_conn_with_type(int32_t backend_fd, enum zxy
     }
 
     case SSL_CONN: {
-        //TODO: handle ssl
+        zxy_backend_ssl_conn_t *backend_ssl_conn = zxy_make_backend_ssl_conn(ctx, backend_fd);
+        backend_base = zxy_make_ssl_backend_base_conn((void*)backend_ssl_conn);
+        zxy_set_up_backend_ssl_base_callbacks(backend_base);
         break;
     }
 

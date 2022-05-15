@@ -17,9 +17,9 @@
 #include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
 
-int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed_bytes);
+int zxy_client_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed_bytes);
 
-int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn);
+int zxy_client_encrypt_io_req(zxy_client_ssl_conn_t *client_conn);
 
 enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};
 
@@ -55,7 +55,7 @@ zxy_client_base_t* convert_client_ssl_base(void *ptr)
 }
 
 //TODO: wtf just happend
-// void zxy_queue_encrypted_bytes(zxy_client_ssl_conn_t *client_conn, size_t len)
+// void zxy_client_queue_encrypted_bytes(zxy_client_ssl_conn_t *client_conn, size_t len)
 // {
 //     if (zxy_should_resize_buffer(client_conn->writing_buffer_manager)) {
 //         zxy_double_buffer_size(client_conn->writing_buffer_manager);
@@ -72,7 +72,7 @@ zxy_client_base_t* convert_client_ssl_base(void *ptr)
 //     zxy_nbyte_written_to_buffer(client_conn->writing_buffer_manager, len);
 // }
 
-void zxy_queue_encrypted_bytes(zxy_client_ssl_conn_t *client_conn, char *buf, size_t len)
+void zxy_client_queue_encrypted_bytes(zxy_client_ssl_conn_t *client_conn, char *buf, size_t len)
 {
     if (zxy_should_resize_buffer(client_conn->writing_buffer_manager)) {
         zxy_double_buffer_size(client_conn->writing_buffer_manager);
@@ -92,7 +92,7 @@ void zxy_queue_encrypted_bytes(zxy_client_ssl_conn_t *client_conn, char *buf, si
     zxy_nbyte_written_to_buffer(client_conn->writing_buffer_manager, len);
 }
 
-void zxy_queue_unencrypted_bytes(zxy_client_ssl_conn_t *client_conn, char *buf, size_t len)
+void zxy_client_queue_unencrypted_bytes(zxy_client_ssl_conn_t *client_conn, char *buf, size_t len)
 {
      if (zxy_should_resize_buffer(client_conn->encrypt_buffer_manager)) {
         zxy_double_buffer_size(client_conn->encrypt_buffer_manager);
@@ -151,7 +151,7 @@ int zxy_on_client_ssl_read_event(void *ptr)
 
     LOG_INFO("Total bytes until know for FD(%d): %d\n", client_conn->sock_fd, client_conn->read_buffer_manager->current_buffer_ptr);
 
-    int result = zxy_proccess_ssl_bytes(client_conn, read_nbytes);
+    int result = zxy_client_proccess_ssl_bytes(client_conn, read_nbytes);
 
     // zxy_clean_nbytes_from_buffer(client_conn->read_buffer_manager, client_conn->read_buffer_manager->current_buffer_ptr);
     // client_conn->read_buffer_manager->current_buffer_ptr = 0;
@@ -170,7 +170,7 @@ int zxy_on_client_ssl_read_event(void *ptr)
     return nbytes;
 }
 
-int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed_bytes)
+int zxy_client_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed_bytes)
 {
     //proccessing ssl bytes
     //TODO: eliminate getting large chunk on stack
@@ -218,7 +218,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
                 do {
                     n = BIO_read(client_conn->wbio, buf, sizeof(buf));
                     if (n > 0)
-                        zxy_queue_encrypted_bytes(client_conn, buf, n);
+                        zxy_client_queue_encrypted_bytes(client_conn, buf, n);
                     else if (!BIO_should_retry(client_conn->wbio)) {
                         LOG_ERROR("Error wbio for FD(%d)\n", client_conn->sock_fd);
                         return -1;
@@ -271,7 +271,7 @@ int zxy_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number_readed
         do {
             n = BIO_read(client_conn->wbio, buf, sizeof(buf));
             if (n > 0)
-                zxy_queue_encrypted_bytes(client_conn, buf, n);
+                zxy_client_queue_encrypted_bytes(client_conn, buf, n);
             else if (!BIO_should_retry(client_conn->wbio)) {
                 LOG_ERROR("Error wbio for FD(%d)\n", client_conn->sock_fd);
                 return UNKOWN_ERROR;
@@ -303,10 +303,10 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         client_conn->encrypt_buffer_manager->max_size_of_buffer,
         client_conn->encrypt_buffer_manager->current_buffer_ptr);
 
-    zxy_queue_unencrypted_bytes(client_conn, write_req->buffer, write_req->send_nbytes);
+    zxy_client_queue_unencrypted_bytes(client_conn, write_req->buffer, write_req->send_nbytes);
     nbytes = write_req->send_nbytes;
     
-    zxy_encrypt_io_req(client_conn);
+    zxy_client_encrypt_io_req(client_conn);
 
     write_req->buffer = client_conn->writing_buffer_manager->buffer;
     write_req->send_nbytes = client_conn->writing_buffer_manager->current_buffer_ptr;
@@ -341,7 +341,7 @@ int zxy_on_client_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
     return nbytes;
 }
 
-int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn)
+int zxy_client_encrypt_io_req(zxy_client_ssl_conn_t *client_conn)
 {
     char buf[READ_BUF_SIZE];
     enum sslstatus status;
@@ -376,7 +376,7 @@ int zxy_encrypt_io_req(zxy_client_ssl_conn_t *client_conn)
             do {
                 n = BIO_read(client_conn->wbio, buf, sizeof(buf));
                 if (n > 0) {
-                    zxy_queue_encrypted_bytes(client_conn, buf, n);
+                    zxy_client_queue_encrypted_bytes(client_conn, buf, n);
                 }
                 else if (!BIO_should_retry(client_conn->wbio)) {
                     return -1;
