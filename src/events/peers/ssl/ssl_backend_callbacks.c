@@ -181,7 +181,7 @@ int zxy_backend_proccess_ssl_bytes(zxy_backend_ssl_conn_t *backend_conn, int num
     enum sslstatus status;
 
 
-    // LOG_INFO("go read %d\n", number_readed_bytes);
+    LOG_INFO("go read %d\n", number_readed_bytes);
 
     while (number_readed_bytes > 0) {
 
@@ -245,7 +245,7 @@ int zxy_backend_proccess_ssl_bytes(zxy_backend_ssl_conn_t *backend_conn, int num
             // if (n > 0)
             //     backend.io_on_read(buf, (size_t)n);
             if (n > 0) {
-                if (zxy_should_resize_buffer(backend_conn->plain_buffer_manager)) {
+                if (zxy_should_resize_buffer(backend_conn->plain_buffer_manager) || !zxy_can_write_nbytes_to_buffer(backend_conn->plain_buffer_manager, n)) {
                     zxy_double_buffer_size(backend_conn->plain_buffer_manager);
                 }
 
