@@ -10,8 +10,9 @@
 #include "utils/ssl/ssl_helper.h"
 #include "logging/logs.h"
 
-SSL_CTX* ssl_init()
+struct contexts ssl_init()
 {
+    struct contexts ctxs;
     SSL_load_error_strings();
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
@@ -21,8 +22,10 @@ SSL_CTX* ssl_init()
     // const SSL_METHOD *method = TLS_server_method();
     // SSL_CTX *ctx = SSL_CTX_new(method);
 
-    ctx = SSL_CTX_new(SSLv23_server_method());
-
+    SSL_CTX *server_ctx = SSL_CTX_new(SSLv23_server_method());
+    ctxs.server_ctx = server_ctx;
+    SSL_CTX *client_ctx = SSL_CTX_new(SSLv23_client_method());
+    ctxs.client_ctx = client_ctx;
     // if (!SSL_CTX_set_cipher_list(ctx, SSL_CIPHER)) {
     //     LOG_FATAL(-1, "Cannot set cipher %s on ctx\n", SSL_CIPHER);
     // }
@@ -31,8 +34,7 @@ SSL_CTX* ssl_init()
     //     LOG_FATAL(-1, "cannot disable compression\n");
     // }
 
-    return ctx;
-
+    return ctxs;
 }
 
 int ssl_load_certificates_and_private_keys(SSL_CTX *ctx, char *certificate_location, char *priv_key_location)

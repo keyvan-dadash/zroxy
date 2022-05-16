@@ -168,7 +168,7 @@ void zxy_handle_backend_events(
         zxy_write_io_req_t write_req = client_base->request_buffer_reader(client_base);
 
         LOG_INFO("Backend is ready to write:%d %s\n", write_req.send_nbytes, write_req.buffer);
-        if (write_req.send_nbytes > 0)
+        //if (write_req.send_nbytes > 0)
             backend_base->on_write((void*)backend_base, &write_req);
 
         zxy_check_client_close(

@@ -345,9 +345,45 @@ int zxy_backend_encrypt_io_req(zxy_backend_ssl_conn_t *backend_conn)
 {
     char buf[READ_BUF_SIZE];
     enum sslstatus status;
+    int n;
+    if (!SSL_is_init_finished(backend_conn->ssl)) {
+      LOG_ERROR("heloooooooooooo\n");
+      n = SSL_connect(backend_conn->ssl);
 
-    if (!SSL_is_init_finished(backend_conn->ssl))
-        return 0;
+            if (n < 0) {
+                int error = SSL_get_error(backend_conn->ssl, n);
+                LOG_ERROR("%d %s\n", error, ERR_error_string(ERR_get_error(), NULL));
+            }
+
+
+            status = get_sslstatus(backend_conn->ssl, n);
+
+            LOG_INFO("Retrun from SSL_connect for FD(%d): %d\n", backend_conn->sock_fd, n);
+
+            if (status == SSLSTATUS_WANT_IO) {
+                do {
+                    n = BIO_read(backend_conn->wbio, buf, sizeof(buf));
+                    if (n > 0)
+                        zxy_backend_queue_encrypted_bytes(backend_conn, buf, n);
+                    else if (!BIO_should_retry(backend_conn->wbio)) {
+                        LOG_ERROR("Error wbio for FD(%d)\n", backend_conn->sock_fd);
+                        return -1;
+                    }
+                } while(n > 0);
+            }
+
+
+            if (status == SSLSTATUS_FAIL) {
+                LOG_ERROR("Unkown error for FD(%d)\n", backend_conn->sock_fd);
+                return UNKOWN_ERROR;
+            }
+
+            LOG_INFO("Final bytes for FD(%d) is %d\n", backend_conn->sock_fd, n);
+
+            if (!SSL_is_init_finished(backend_conn->ssl))
+                return 0;
+
+    }
 
     while (backend_conn->encrypt_buffer_manager->current_buffer_ptr >0) {
         int n = SSL_write(

@@ -3,7 +3,8 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-SSL_CTX *ctx;
+SSL_CTX *server_ctx;
+SSL_CTX *client_ctx;
 
 #define READ_BUF_SIZE 4096
 

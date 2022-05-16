@@ -3,7 +3,13 @@
 
 #include <openssl/ssl.h>
 
-SSL_CTX* ssl_init();
+struct contexts
+{
+  SSL_CTX* client_ctx;
+  SSL_CTX* server_ctx;
+};
+
+struct contexts ssl_init();
 
 int ssl_load_certificates_and_private_keys(SSL_CTX *ctx, char *certificate, char *priv_key);
 

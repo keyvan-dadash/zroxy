@@ -3,6 +3,7 @@
 #include <openssl/err.h>
 
 #include "defines.h"
+#include "logging/logs.h"
 #include "events/io/epoll_manager.h"
 #include "connections/conntypes/proxy_types.h"
 #include "connections/conntypes/backend_types.h"
@@ -33,10 +34,8 @@ zxy_backend_ssl_conn_t* zxy_make_backend_ssl_conn(SSL_CTX *ctx, int sock_fd)
     backend_conn->rbio = BIO_new(BIO_s_mem());
     backend_conn->wbio = BIO_new(BIO_s_mem());
     backend_conn->ssl = SSL_new(ctx);
-    SSL_set_fd(backend_conn->ssl, sock_fd);
-    SSL_set_connect_state(backend_conn->ssl);
     
-    SSL_set_accept_state(backend_conn->ssl);
+    SSL_set_connect_state(backend_conn->ssl);
     SSL_set_bio(backend_conn->ssl, backend_conn->rbio, backend_conn->wbio);
 
     return backend_conn;

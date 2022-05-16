@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
     struct addrinfo *addrs_iter;
     int getaddrinfo_error;
 
+    struct contexts ctxs;
+
     int server_sock;
 
     int so_reuseaddr;
@@ -41,8 +43,10 @@ int main(int argc, char *argv[])
 
     SSL_library_init();
 
-    ctx = ssl_init();
-    ssl_load_certificates_and_private_keys(ctx, cert_config.certificate_path, cert_config.private_key_path);
+    ctxs = ssl_init();
+    server_ctx = ctxs.server_ctx;
+    client_ctx = ctxs.client_ctx;
+    ssl_load_certificates_and_private_keys(server_ctx, cert_config.certificate_path, cert_config.private_key_path);
 
     memset(&hints, 0, sizeof(struct addrinfo));
 
