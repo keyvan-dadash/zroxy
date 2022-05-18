@@ -126,6 +126,11 @@ typedef struct
     zxy_buffer_manager_t *plain_buffer_manager;
 
     /**
+     * Decide when we should start to parse http requests
+     */
+    int8_t is_ssl_handshake_done;
+
+    /**
      * should free?
      */
     int8_t set_free;

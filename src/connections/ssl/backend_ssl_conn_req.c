@@ -26,6 +26,7 @@ zxy_backend_ssl_conn_t* zxy_make_backend_ssl_conn(SSL_CTX *ctx, int sock_fd)
 
     backend_conn->sock_fd = sock_fd;
     backend_conn->is_closed = 0;
+    backend_conn->is_ssl_handshake_done = 0;
     backend_conn->set_free = 0;
     backend_conn->encrypt_buffer_manager = zxy_malloc_buffer_manager_with_buffer_size(READ_BUF_SIZE + 1);
     backend_conn->writing_buffer_manager = zxy_malloc_buffer_manager_with_buffer_size(READ_BUF_SIZE + 1);

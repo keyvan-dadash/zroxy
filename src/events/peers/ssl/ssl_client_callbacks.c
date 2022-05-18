@@ -236,6 +236,7 @@ int zxy_client_proccess_ssl_bytes(zxy_client_ssl_conn_t *client_conn, int number
 
             if (!SSL_is_init_finished(client_conn->ssl))
                 return 0;
+            client_conn->is_ssl_handshake_done = 1;
         }
 
         LOG_INFO("Going to SSL_read for FD(%d)\n", client_conn->sock_fd);
