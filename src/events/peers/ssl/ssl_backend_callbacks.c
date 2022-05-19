@@ -16,7 +16,7 @@
 #include "utils/io/io_helper.h"
 #include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
-#include "parsers/http/detail/picohttpparser.h"
+#include "parsers/http/http_parser.h"
 
 int zxy_backend_proccess_ssl_bytes(zxy_backend_ssl_conn_t *backend_conn, int number_readed_bytes);
 
@@ -305,23 +305,18 @@ int zxy_on_backend_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         backend_conn->encrypt_buffer_manager->max_size_of_buffer,
         backend_conn->encrypt_buffer_manager->current_buffer_ptr);
 
-    if (backend_conn->is_ssl_handshake_done == 1)
+    if (likely(backend_conn->is_ssl_handshake_done == 1))
     {
-      const char *method, *path;
-      int pret, minor_version;
-      struct phr_header headers[100];
-      size_t method_len, path_len, num_headers;
+      int pret;
+      struct http_request_details http_req;
+      http_req.http_commons.http_buffer = write_req->buffer;
+      http_req.http_commons.size_of_http_buffer = write_req->send_nbytes;
+      http_req.http_commons.max_buffer_size = backend_conn->encrypt_buffer_manager->max_size_of_buffer;
 
-      num_headers = sizeof(headers) / sizeof(headers[0]);
-      pret = phr_parse_request(write_req->buffer, write_req->send_nbytes, &method, &method_len, &path, &path_len,
-                             &minor_version, headers, &num_headers, 0);
+      pret = zxy_parse_http_request(&http_req);
       if (pret > 0)
       {
-        LOG_INFO("Parsed request. Method is: %.*s\n", (int)method_len, method);
-      }
-      else if (pret == -1)
-      {
-        LOG_INFO("We cannot parse request\n");
+        LOG_INFO("Method is %.*s\n", (int)http_req.method_len, http_req.method);
       }
     }
 
