@@ -119,6 +119,8 @@ void zxy_handle_client_events(
     if (client_base->is_ready_event(events, WRITE_EVENT, client_base)) {
         zxy_write_io_req_t write_req = backend_base->request_buffer_reader(backend_base);
 
+        
+        LOG_INFO("Client is ready to write:%d %s\n", write_req.send_nbytes, write_req.buffer);
         // LOG_INFO("write\n");
         // if (write_req.send_nbytes > 0)
         // This is problem due to ssl handshake

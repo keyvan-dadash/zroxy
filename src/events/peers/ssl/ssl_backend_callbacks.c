@@ -16,7 +16,7 @@
 #include "utils/io/io_helper.h"
 #include "utils/io/buffer_manager.h"
 #include "utils/timer/timers.h"
-#include "parsers/http/picohttpparser.h"
+#include "parsers/http/detail/picohttpparser.h"
 
 int zxy_backend_proccess_ssl_bytes(zxy_backend_ssl_conn_t *backend_conn, int number_readed_bytes);
 

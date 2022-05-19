@@ -34,15 +34,9 @@
 #include <x86intrin.h>
 #endif
 #endif
-#include "parsers/http/picohttpparser.h"
 
-#if __GNUC__ >= 3
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#else
-#define likely(x) (x)
-#define unlikely(x) (x)
-#endif
+#include "defines.h"
+#include "parsers/http/detail/picohttpparser.h"
 
 #ifdef _MSC_VER
 #define ALIGNED(n) _declspec(align(n))
