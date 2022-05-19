@@ -305,8 +305,8 @@ int zxy_on_backend_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         backend_conn->encrypt_buffer_manager->max_size_of_buffer,
         backend_conn->encrypt_buffer_manager->current_buffer_ptr);
 
-    if (likely(backend_conn->is_ssl_handshake_done == 1))
-    {
+    //if (likely(backend_conn->is_ssl_handshake_done == 1))
+    //{
       int pret;
       struct http_request_details http_req;
       http_req.http_commons.http_buffer = write_req->buffer;
@@ -317,8 +317,17 @@ int zxy_on_backend_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
       if (pret > 0)
       {
         LOG_INFO("Method is %.*s\n", (int)http_req.method_len, http_req.method);
+
+      struct http_header header;
+      header.name = "Host\0";
+      header.name_len = strlen(header.name);
+      header.value = "www.quera.org\0";
+      header.value_len = strlen(header.value);
+      pret = zxy_modify_http_headers(&http_req.http_commons, &header);
+      write_req->send_nbytes += pret;
+      LOG_INFO("Modified Req is \n%s\n", write_req->buffer);
       }
-    }
+    //}
 
     zxy_backend_queue_unencrypted_bytes(backend_conn, write_req->buffer, write_req->send_nbytes);
     nbytes = write_req->send_nbytes;
@@ -333,7 +342,7 @@ int zxy_on_backend_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
         LOG_INFO("Send bytes is under zero for FD(%d)\n", backend_conn->sock_fd);
         return 0;
     }
-
+    
     ssl_nbytes = zxy_write_socket_non_block_and_clear_buf(write_req);
 
     memmove(
