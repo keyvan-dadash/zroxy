@@ -321,7 +321,7 @@ int zxy_on_backend_ssl_write_event(void *ptr, zxy_write_io_req_t* write_req)
       struct http_header header;
       header.name = "Host\0";
       header.name_len = strlen(header.name);
-      header.value = "www.quera.org\0";
+      header.value = "quera.org\0";
       header.value_len = strlen(header.value);
       pret = zxy_modify_http_headers(&http_req.http_commons, &header);
       write_req->send_nbytes += pret;
