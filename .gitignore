@@ -8,6 +8,7 @@
 
 #build folders
 build/
+_build/
 
 #ide
 .vscode/
