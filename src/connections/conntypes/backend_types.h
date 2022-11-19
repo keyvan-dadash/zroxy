@@ -26,115 +26,156 @@ typedef int  (*zxy_backend_memebr_func)(u_int32_t, u_int32_t, void*);
 typedef void (*zxy_backend_free_params)(void*);
 
 /**
- * backend base connection which is all other type of backend connection should implement this
+ * Backend base connection which is all other type of backend connection implementing this.
  */
 typedef struct 
 {
     /**
-     * backend callback functions
+     * Read callback.
      */
     zxy_backend_read_callback_func on_read;
+
+    /**
+     * Write callback.
+     */
     zxy_backend_write_callback_func on_write;
+
+    /**
+     * Close callback.
+     */
     zxy_backend_close_callback_func on_close;
 
     /**
-     * backend extra function for controll object
+     * Request buffer for read operation.
      */
     zxy_backend_request_buffer_reader request_buffer_reader;
+
+    /**
+     * Function for advance pointer of underlying buffer by n bytes.
+     */
     zxy_backend_read_nbytes_from_buffer_func read_nbytes;
+
+    /**
+     * Function for closing connection by force.
+     */
     zxy_backend_close_callback_func force_close;
+
+    /**
+     * Check if specific event is ready or not.
+     */
     zxy_backend_memebr_func is_ready_event;
+
+    /**
+     * Free allocated parameters during establishment of the connection.
+     */
     zxy_backend_free_params free_params;
 
     /**
-     * params which is passed to each of above functions and is custom impelementation of your connection
-     * 
+     * Params which is passed to each of above functions and is custom impelementation of your connection.
      */
     void *params;
 
     /**
-     * should free?
+     * Show different status during different state of the connection. 
      */
     int8_t set_free;
 } zxy_backend_base_t;
 
 /**
- * backend plain connection
+ * Backend plain connection properties.
  */
 typedef struct 
 {
     /**
-     * sock fd properties
+     * Socket fd obtained during establishment of the connection.
      */
     int sock_fd;
+
+    /**
+     * Set when the connection closed.
+     */
     int8_t is_closed;
+
+    /**
+     * Current events that set on the connection.
+     */
     u_int32_t events;
 
     /**
-     * buffer manager which is controll buffer resize and nasty bit hacks
+     * Buffer manager which is controll buffer resize and nasty bit hacks.
      */
     zxy_buffer_manager_t *buffer_manager;
 
     /**
-     * should free?
+     * Show different status during different state of the connection. 
      */
     int8_t set_free;
-
 } zxy_backend_conn_t;
 
 /**
- * backend ssl connection
+ * Backend ssl connection properties.
  */
 typedef struct 
 {
     /**
-     * sock fd properties
+     * Socket fd obtained during establishment of the connection.
      */
     int sock_fd;
+
+    /**
+     * Set when the connection closed.
+     */
     int8_t is_closed;
+
+    /**
+     * Current events that set on the connection.
+     */
     u_int32_t events;
 
     /**
-     * SSL Obj
+     * SSL Obj representing SSL states.
      */
     SSL *ssl;
 
     /**
-     * BIO objects for reading and writing non block
+     * BIO object for reading asynchronous.
      */
     BIO *rbio;
+
+    /**
+     * BIO object for writing asynchronous.
+     */
     BIO *wbio;
 
     /**
-     * encrypt buffer manager which is controll data which is should go through ssl for encryption
+     * Encrypt buffer manager controls data that is pass through ssl for encryption.
      */
     zxy_buffer_manager_t *encrypt_buffer_manager;
 
     /**
-     * buffer which is should write to sockets
+     * Buffer manager that is use for writing data in the socket.
      */
     zxy_buffer_manager_t *writing_buffer_manager;
 
     /**
-     * buffer which is should read
+     * Buffer manager that is use for reading data from the socket.
      */
     zxy_buffer_manager_t *read_buffer_manager;
 
     /**
-     * this where other peer read unencrypt data
+     * Buffer manager that is use for reading plain data.
      */
     zxy_buffer_manager_t *plain_buffer_manager;
 
     /**
-     * Decide when we should start to parse http requests
+     * Show that when zroxy able to parse http request.
      */
     int8_t is_ssl_handshake_done;
 
     /**
-     * should free?
+     * Show different status during different state of the connection. 
      */
     int8_t set_free;
-
 } zxy_backend_ssl_conn_t;
 
 #endif /* BACKEND_TYPES_H */

@@ -8,27 +8,62 @@
 
 typedef void (*proxy_callback_func)(void*);
 
+/**
+ * The enumeration of connection types.
+ */
 enum zxy_conn_type
 {
+    /**
+     * Connection type is plain.
+     */
     PLAIN_CONN,
+
+    /**
+     * Connection type is ssl.
+     */
     SSL_CONN
 };
 
+/**
+ * Represent each connection settings and config in zroxy.
+ */
 typedef struct 
 {
+    /**
+     * Client connection parameters and settings.
+     */
     zxy_client_base_t *client;
+
+    /**
+     * Backend connection parameters and settings.
+     */
     zxy_backend_base_t *backend;
 
-    void *client_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
-    void *backend_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
-    void *timer_handler_ptr; //workaround: cannot free memory of handler when calling epoll_ctl with remove flag
+    /**
+     * Pointer to handler function for handling client connection events.
+     */
+    void *client_handler_ptr;
 
+    /**
+     * Pointer to handler function for handling backend connection events.
+     */
+    void *backend_handler_ptr;
+
+    /**
+     * Pointer to handler function for handling timeout event.
+     */
+    void *timer_handler_ptr;
+
+    /**
+     * Shows timer current status and socket fd.
+     */
     int32_t timer_status_and_fd;
 
     /**
-     * refrence counter
+     * Refrence counter for determining when should zroxy free allocated proxy connection settings.
      */
     int refrence_counter;
 } zxy_proxy_connection_t;
 
 #endif /* PROXY_TYPES_H */
+
