@@ -1,3 +1,7 @@
+/**
+ * @file buffer_manager.h
+ */
+
 #ifndef BUFFER_MANAGER_H
 #define BUFFER_MANAGER_H
 

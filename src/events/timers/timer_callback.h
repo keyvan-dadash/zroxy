@@ -1,3 +1,7 @@
+/**
+ * @file timer_callback.h
+ */
+
 #ifndef TIMER_CALLBACK_H
 #define TIMER_CALLBACK_H
 

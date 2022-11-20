@@ -1,3 +1,6 @@
+/**
+ * @file proxy_types.h
+ */
 #ifndef PROXY_TYPES_H
 #define PROXY_TYPES_H
 

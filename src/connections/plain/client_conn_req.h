@@ -1,3 +1,7 @@
+/**
+ * @file client_conn_req.h
+ */
+
 #ifndef CLIENT_CONN_REQ_H
 #define CLIENT_CONN_REQ_H
 

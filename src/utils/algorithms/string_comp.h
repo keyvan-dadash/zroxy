@@ -1,3 +1,7 @@
+/**
+ * @file string_comp.h
+ */
+
 #ifndef STRING_COMP_H
 #define STRING_COMP_H
 

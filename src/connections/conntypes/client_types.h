@@ -1,3 +1,6 @@
+/**
+ * @file client_types.h
+ */
 #ifndef CLIENT_TYPES_H
 #define CLIENT_TYPES_H
 
