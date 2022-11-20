@@ -7,58 +7,113 @@
 #include "utils/algorithms/string_comp.h"
 #include "parsers/http/detail/picohttpparser.h"
 
+/**
+ * Holds HTTP Header data's.
+ */
 struct http_header
 {
+  /**
+   * Name of the header(aka key).
+   */
   const char *name;
+
+  /**
+   * Lenght of the name.
+   */
   size_t name_len;
+
+  /**
+   * Value of the name in the header.
+   */
   const char *value;
+
+  /**
+   * Lenght of the value.
+   */
   size_t value_len;
 };
 
+/**
+ * Holds all HTTP headers.
+ */
 struct http_headers
 {
+  /**
+   * Array of headers.
+   */
   struct phr_header headers[MAX_NUM_HEADERS];
+
+  /**
+   * Number of headers that present in HTTP Request.
+   */
   size_t number_of_actual_headers;
 };
 
+/**
+ * HTTP common details.
+ */
 struct http_common_details
 {
-  const char *http_buffer;
-  u_int32_t size_of_http_buffer;
-  u_int64_t max_buffer_size;
-  
   /**
-   * HTTP headers
+   * HTTP buffer.
+   */
+  const char *http_buffer;
+
+  /**
+   * Size of the HTTP buffer.
+   */
+  u_int32_t size_of_http_buffer;
+
+  /**
+   * Maximum size of HTTP buffer.
+   */
+  u_int64_t max_buffer_size;
+
+  /**
+   * Headers of the HTTP request or response.
    */
   struct http_headers headers;
-
 };
 
+/**
+ * HTTP Request details.
+ */
 struct http_request_details
 {
    /**
-   * Common HTTP attributes
+   * Common HTTP attributes.
    */
   struct http_common_details http_commons;
 
   /**
-   * Method properties
+   * Method of the HTTP Request.
    */
   const char *method;
+
+  /**
+   * Method lenght.
+   */
   size_t method_len;
 
   /**
-   * Path properties
+   * Path of the HTTP Request.
    */
   const char *path;
+
+  /**
+   * Path lenght.
+   */
   size_t path_len;
 
   /**
-   * HTTP version
+   * HTTP version.
    */
   int minor_version;
 };
 
+/**
+ * HTTP Response details.
+ */
 struct http_response_details
 {
   /**
@@ -67,22 +122,31 @@ struct http_response_details
   struct http_common_details http_commons;
 
   /**
-   * HTTP version
+   * HTTP version.
    */
   int minor_version;
 
   /**
-   * Status
+   * Status of the HTTP Response.
    */
   int status;
 
   /**
-   * Message
+   * Message of the HTTP Response.
    */
   const char *msg;
+
+  /**
+   * Message lenght.
+   */
   size_t msg_len;
 };
 
+/**
+ * Parse HTTP Request.
+ * \param http_request Pointer to the details of the HTTP Request.
+ * \return Returns number of bytes consumed if successful, -2 if request is partial, -1 if failed.
+ */
 FORCE_INLINE int zxy_parse_http_request(struct http_request_details *http_request)
 {
   http_request->http_commons.headers.number_of_actual_headers = sizeof(http_request->http_commons.headers.headers) / sizeof(http_request->http_commons.headers.headers[0]);
@@ -91,6 +155,11 @@ FORCE_INLINE int zxy_parse_http_request(struct http_request_details *http_reques
       &http_request->http_commons.headers.number_of_actual_headers, 0);
 }
 
+/**
+ * Parse HTTP Response.
+ * \param http_response Pointer to the details of the HTTP Response.
+ * \return Returns number of bytes consumed if successful, -2 if request is partial, -1 if failed.
+ */
 FORCE_INLINE int zxy_parse_http_response(struct http_response_details *http_response)
 {
   http_response->http_commons.headers.number_of_actual_headers = sizeof(http_response->http_commons.headers.headers) / sizeof(http_response->http_commons.headers.headers[0]);
@@ -99,6 +168,11 @@ FORCE_INLINE int zxy_parse_http_response(struct http_response_details *http_resp
       &http_response->http_commons.headers.number_of_actual_headers, 0);
 }
 
+/**
+ * Parse HTTP Headers.
+ * \param http_commons Pointer to the details of the HTTP Commons.
+ * \return Returns number of bytes consumed if successful, -2 if request is partial, -1 if failed.
+ */
 FORCE_INLINE int zxy_parse_http_headers(struct http_common_details *http_commons)
 {
   http_commons->headers.number_of_actual_headers = sizeof(http_commons->headers.headers) / sizeof(http_commons->headers.headers[0]);
@@ -106,6 +180,12 @@ FORCE_INLINE int zxy_parse_http_headers(struct http_common_details *http_commons
       &http_commons->headers.number_of_actual_headers, 0);
 }
 
+/**
+ * Modify HTTP Headers.
+ * \param http_detail Pointer to the details of the HTTP Commons.
+ * \param modify_headers Pointer to the new HTTP Headers.
+ * \return Difference in byte manner between new and old HTTP Headers.
+ */
 FORCE_INLINE int zxy_modify_http_headers(struct http_common_details *http_detail, struct http_header *modify_headers)
 {
   struct phr_header *headers = http_detail->headers.headers;

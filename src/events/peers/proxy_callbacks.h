@@ -18,3 +18,4 @@ void zxy_proxy_events_callback(void* handler, int sock_fd, u_int32_t events);
 void zxy_free_proxy_obj(void* params);
 
 #endif /* PROXY_CALLBACKS */
+
