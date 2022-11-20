@@ -5,6 +5,13 @@
 
 #include "defines.h"
 
+/**
+ * A fast comparison between two string.
+ * \param ptr0 Pointer to the first string.
+ * \param ptr1 Pointer to the second string.
+ * \param len The maximum size which function going to compare two string.
+ * \return Return thhe diffrence between first unequal met charachter, so return 0 if two string is equal.
+ */
 // https://mgronhol.github.io/fast-strcmp/
 FORCE_INLINE int fast_compare( const char *ptr0, const char *ptr1, int len ){
   int fast = len/sizeof(size_t) + 1;
